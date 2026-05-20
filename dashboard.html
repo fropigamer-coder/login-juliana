@@ -43,6 +43,10 @@
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #3d4154; border-radius: 10px; }
+
+        /* Quotes Table Styles */
+        .quote-item-row input { background: transparent; border: none; width: 100%; outline: none; color: white; font-size: 12px; }
+        .quote-item-row td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="flex min-h-screen overflow-hidden" onclick="closeAllDropdowns()">
@@ -98,7 +102,7 @@
             </div>
         </header>
 
-        <!-- View: EVENTS (Original Calendar) -->
+        <!-- View: EVENTS -->
         <div id="view-events" class="flex flex-grow overflow-hidden p-8 gap-8">
             <div class="flex-grow flex flex-col min-w-0">
                 <div class="flex items-center justify-between mb-6">
@@ -156,12 +160,10 @@
             </div>
         </div>
 
-        <!-- View: DASHBOARD (Summary) -->
+        <!-- View: DASHBOARD -->
         <div id="view-dashboard" class="hidden flex-grow overflow-y-auto p-8">
             <div class="grid grid-cols-12 gap-8 h-full">
-                <!-- Left Section -->
                 <div class="col-span-8 space-y-8">
-                    <!-- Next Major Event -->
                     <div id="main-event-card" class="glass-card p-8 bg-gradient-to-br from-[#fe5126] to-[#ff8c6b] text-white">
                         <div class="flex justify-between items-start mb-6">
                             <div>
@@ -182,21 +184,14 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- My Tasks List -->
                     <div class="glass-card p-8 flex flex-col h-[500px]">
                         <div class="flex justify-between items-center mb-8">
                             <h3 class="text-xl font-bold">Mis Pendientes <span id="dash-task-count" class="text-slate-500 text-sm ml-2">(0)</span></h3>
                         </div>
-                        <div id="dash-tasks-list" class="space-y-2 overflow-y-auto pr-2">
-                            <!-- Tasks rows injected here -->
-                        </div>
+                        <div id="dash-tasks-list" class="space-y-2 overflow-y-auto pr-2"></div>
                     </div>
                 </div>
-
-                <!-- Right Section -->
                 <div class="col-span-4 space-y-8">
-                    <!-- Mini Calendar -->
                     <div class="glass-card p-6">
                         <div class="flex justify-between items-center mb-6">
                             <h4 id="mini-month" class="font-bold">Abril 2026</h4>
@@ -214,18 +209,16 @@
             </div>
         </div>
 
-        <!-- View: QUOTES (New) -->
+        <!-- View: QUOTES -->
         <div id="view-quotes" class="hidden flex-grow overflow-y-auto p-8">
             <div class="glass-card p-8 h-full flex flex-col">
                 <div class="flex flex-wrap items-center justify-between gap-6 mb-8">
                     <div class="flex items-center gap-4 flex-grow max-w-2xl">
-                        <!-- Buscador por nombre -->
                         <div class="relative flex-grow">
                             <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            <input type="text" id="quoteSearchName" placeholder="Buscar por nombre..." class="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 outline-none focus:border-[#fe5126] transition text-white text-sm">
+                            <input type="text" id="quoteSearchName" oninput="renderQuotes()" placeholder="Buscar por cliente/empresa..." class="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 outline-none focus:border-[#fe5126] transition text-white text-sm">
                         </div>
-                        <!-- Filtro por fecha -->
-                        <input type="date" id="quoteSearchDate" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#fe5126] transition text-slate-400 text-sm">
+                        <input type="date" id="quoteSearchDate" oninput="renderQuotes()" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#fe5126] transition text-slate-400 text-sm">
                     </div>
                     <button onclick="openQuoteModal()" class="bg-[#fe5126] text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-orange-500/20 active:scale-95 transition-all flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -233,17 +226,19 @@
                     </button>
                 </div>
 
-                <div id="quotesList" class="flex-grow flex flex-col items-center justify-center text-slate-600 italic">
-                    <div class="text-center">
-                        <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <p class="text-lg">No hay cotizaciones creadas</p>
+                <div id="quotesList" class="flex-grow overflow-y-auto pr-2">
+                    <div class="flex flex-col items-center justify-center text-slate-600 italic h-full">
+                        <div class="text-center">
+                            <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <p class="text-lg">No hay cotizaciones creadas</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Modal Form -->
+    <!-- Task Modal (Existing) -->
     <div id="taskModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
         <div class="bg-[#232632] w-[450px] rounded-3xl p-8 border border-white/10 shadow-2xl scale-95 opacity-0 transition-all duration-300 transform" id="modalContent">
             <h3 class="text-xl font-bold mb-6 text-white">Añadir Nuevo Evento</h3>
@@ -257,6 +252,114 @@
                 <div class="flex gap-3 pt-4">
                     <button type="button" onclick="closeModal()" class="flex-grow py-3 rounded-xl font-bold text-slate-400 hover:bg-white/5 transition">Cancelar</button>
                     <button type="submit" class="flex-grow py-3 bg-[#fe5126] rounded-xl font-bold text-white shadow-lg shadow-orange-500/20 active:scale-95 transition-all">Crear Evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quote Modal (New Large) -->
+    <div id="quoteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
+        <div class="bg-[#232632] w-[90%] max-w-5xl max-h-[90vh] rounded-3xl p-8 border border-white/10 shadow-2xl overflow-y-auto scale-95 opacity-0 transition-all duration-300 transform" id="quoteModalContent">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-bold text-white">Nueva Cotización</h3>
+                <button onclick="closeQuoteModal()" class="text-slate-500 hover:text-white transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <form id="quoteForm" class="space-y-8">
+                <!-- Información del Cliente -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Empresa del Trabajo</label>
+                        <input type="text" name="company" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">RUC</label>
+                        <input type="text" name="ruc" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Señor(a)</label>
+                        <input type="text" name="client_name" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Dirección</label>
+                        <input type="text" name="address" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    </div>
+                </div>
+
+                <!-- Fechas y Validez -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Fecha</label>
+                        <input type="date" name="quote_date" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Validez de Oferta</label>
+                        <input type="text" name="offer_validity" placeholder="Ej: 15 días" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Válido hasta</label>
+                        <input type="date" name="valid_until" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    </div>
+                </div>
+
+                <!-- Detalles del Trabajo -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Actividades / Lo que se realiza</label>
+                        <textarea name="activities" rows="2" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white"></textarea>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Descripción General</label>
+                        <textarea name="task_description" rows="2" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white"></textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Ubicación</label>
+                        <input type="text" name="location" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Equipo</label>
+                        <input type="text" name="equipment" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    </div>
+                </div>
+
+                <!-- Tabla de Items -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-sm font-bold text-white uppercase tracking-wider">Items de Cotización</h4>
+                        <button type="button" onclick="addQuoteItem()" class="text-[#fe5126] text-xs font-bold hover:underline">+ Agregar Item</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="text-[10px] font-bold uppercase text-slate-500 bg-white/5">
+                                <tr>
+                                    <th class="p-3">Item</th>
+                                    <th class="p-3">Descripción</th>
+                                    <th class="p-3">Und</th>
+                                    <th class="p-3">Cantidad</th>
+                                    <th class="p-3">P. Unitario</th>
+                                    <th class="p-3">Parcial</th>
+                                    <th class="p-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="quoteItemsTableBody">
+                                <!-- Filas de items inyectadas aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex justify-end pt-4">
+                        <div class="bg-white/5 p-4 rounded-2xl min-w-[200px]">
+                            <p class="text-[10px] font-bold uppercase text-slate-500 mb-1">Total General</p>
+                            <p id="quoteTotalDisplay" class="text-2xl font-bold text-[#fe5126]">S/ 0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-6">
+                    <button type="button" onclick="closeQuoteModal()" class="flex-grow py-3 rounded-xl font-bold text-slate-400 hover:bg-white/5 transition">Cancelar</button>
+                    <button type="submit" class="flex-grow py-3 bg-[#fe5126] rounded-xl font-bold text-white shadow-lg shadow-orange-500/20 active:scale-95 transition-all">Guardar Cotización</button>
                 </div>
             </form>
         </div>
@@ -285,6 +388,7 @@
         let currentDate = new Date();
         let selectedDate = new Date();
         let tasks = [];
+        let quotes = [];
         let editingTaskId = null;
         let currentView = 'events';
         const alertSound = document.getElementById('alertSound');
@@ -292,6 +396,7 @@
 
         async function init() {
             await loadTasks();
+            await loadQuotes();
             populateYearDropdown();
             renderCalendar();
             updateSelectedDateHeader();
@@ -307,9 +412,14 @@
             try {
                 const response = await fetch(`${API_URL}/tasks`);
                 tasks = await response.json();
-            } catch (err) {
-                console.error('Error al cargar tareas:', err);
-            }
+            } catch (err) { console.error('Error:', err); }
+        }
+
+        async function loadQuotes() {
+            try {
+                const response = await fetch(`${API_URL}/quotes`);
+                quotes = await response.json();
+            } catch (err) { console.error('Error:', err); }
         }
 
         function switchView(view) {
@@ -318,7 +428,6 @@
             document.getElementById('view-dashboard').classList.toggle('hidden', view !== 'dashboard');
             document.getElementById('view-quotes').classList.toggle('hidden', view !== 'quotes');
             
-            // Actualizar estados de navegación
             document.getElementById('nav-events').classList.toggle('active-nav', view === 'events');
             document.getElementById('nav-dashboard').classList.toggle('active-nav', view === 'dashboard');
             document.getElementById('nav-quotes').classList.toggle('active-nav', view === 'quotes');
@@ -330,26 +439,136 @@
             else if(view === 'quotes') renderQuotes();
         }
 
+        // --- QUOTES LOGIC ---
         function renderQuotes() {
-            const quotesList = document.getElementById('quotesList');
-            // Por ahora solo manejamos el estado vacío, ya que no hay base de datos de cotizaciones aún
-            quotesList.innerHTML = `
-                <div class="text-center">
-                    <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <p class="text-lg">No hay cotizaciones creadas</p>
+            const list = document.getElementById('quotesList');
+            const searchName = document.getElementById('quoteSearchName').value.toLowerCase();
+            const searchDate = document.getElementById('quoteSearchDate').value;
+
+            const filtered = quotes.filter(q => {
+                const matchesName = q.company.toLowerCase().includes(searchName) || q.client_name.toLowerCase().includes(searchName);
+                const matchesDate = !searchDate || q.quote_date.startsWith(searchDate);
+                return matchesName && matchesDate;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center text-slate-600 italic h-full">
+                        <div class="text-center">
+                            <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <p class="text-lg">No hay cotizaciones que coincidan</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${filtered.map(q => `
+                        <div class="glass-card p-6 border-l-4 border-[#fe5126] hover:bg-white/5 transition cursor-pointer">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">${new Date(q.quote_date).toLocaleDateString()}</span>
+                                <span class="bg-[#fe5126]/10 text-[#fe5126] px-2 py-1 rounded text-[10px] font-bold">S/ ${q.total_amount}</span>
+                            </div>
+                            <h4 class="font-bold text-lg mb-1">${q.company}</h4>
+                            <p class="text-xs text-slate-400 mb-4">${q.client_name}</p>
+                            <div class="text-[10px] text-slate-500 uppercase font-bold flex gap-2">
+                                <span class="bg-white/5 px-2 py-1 rounded">${q.location || 'N/A'}</span>
+                                <span class="bg-white/5 px-2 py-1 rounded">${q.ruc}</span>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             `;
         }
 
         function openQuoteModal() {
-            alert('Función de creación de cotización en desarrollo');
+            document.getElementById('quoteModal').classList.remove('hidden');
+            document.getElementById('quoteModal').classList.add('flex');
+            setTimeout(() => document.getElementById('quoteModalContent').classList.remove('scale-95', 'opacity-0'), 10);
+            document.getElementById('quoteItemsTableBody').innerHTML = '';
+            addQuoteItem(); // Agregar primera fila por defecto
         }
 
+        function closeQuoteModal() {
+            document.getElementById('quoteModalContent').classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                document.getElementById('quoteModal').classList.add('hidden');
+                document.getElementById('quoteModal').classList.remove('flex');
+                document.getElementById('quoteForm').reset();
+            }, 200);
+        }
+
+        function addQuoteItem() {
+            const tbody = document.getElementById('quoteItemsTableBody');
+            const rowCount = tbody.rows.length + 1;
+            const tr = document.createElement('tr');
+            tr.className = 'quote-item-row';
+            tr.innerHTML = `
+                <td><input type="text" value="${rowCount}" readonly class="text-center opacity-50"></td>
+                <td><input type="text" name="item_desc" placeholder="Descripción del servicio..." required></td>
+                <td><input type="text" name="item_und" placeholder="UND" required></td>
+                <td><input type="number" name="item_qty" value="1" min="1" oninput="calculateRow(this)" required></td>
+                <td><input type="number" name="item_price" value="0" min="0" step="0.01" oninput="calculateRow(this)" required></td>
+                <td><input type="number" name="item_partial" value="0" readonly class="font-bold text-[#fe5126]"></td>
+                <td><button type="button" onclick="this.closest('tr').remove(); updateQuoteTotal();" class="text-slate-600 hover:text-red-400">×</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function calculateRow(input) {
+            const row = input.closest('tr');
+            const qty = parseFloat(row.querySelector('[name="item_qty"]').value) || 0;
+            const price = parseFloat(row.querySelector('[name="item_price"]').value) || 0;
+            const partial = row.querySelector('[name="item_partial"]');
+            partial.value = (qty * price).toFixed(2);
+            updateQuoteTotal();
+        }
+
+        function updateQuoteTotal() {
+            const partials = document.querySelectorAll('[name="item_partial"]');
+            let total = 0;
+            partials.forEach(p => total += parseFloat(p.value) || 0);
+            document.getElementById('quoteTotalDisplay').textContent = `S/ ${total.toFixed(2)}`;
+        }
+
+        document.getElementById('quoteForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const items = [];
+            document.querySelectorAll('.quote-item-row').forEach(row => {
+                items.push({
+                    description: row.querySelector('[name="item_desc"]').value,
+                    und: row.querySelector('[name="item_und"]').value,
+                    qty: row.querySelector('[name="item_qty"]').value,
+                    price: row.querySelector('[name="item_price"]').value,
+                    partial: row.querySelector('[name="item_partial"]').value
+                });
+            });
+
+            const data = Object.fromEntries(formData.entries());
+            data.items = items;
+            data.total_amount = document.getElementById('quoteTotalDisplay').textContent.replace('S/ ', '');
+
+            try {
+                const res = await fetch(`${API_URL}/quotes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    await loadQuotes();
+                    renderQuotes();
+                    closeQuoteModal();
+                }
+            } catch (err) { alert('Error al guardar la cotización'); }
+        };
+
+        // --- DASHBOARD LOGIC ---
         function renderDashboard() {
             const taskList = document.getElementById('dash-tasks-list');
             const now = new Date();
-            
-            // Sort tasks by date and time
             const sortedTasks = [...tasks].sort((a,b) => {
                 const da = new Date(a.date + 'T' + a.time);
                 const db = new Date(b.date + 'T' + b.time);
@@ -372,16 +591,11 @@
                     row.innerHTML = `
                         <div class="flex items-center gap-4">
                             <div class="w-10 h-10 rounded-xl glass-card flex items-center justify-center font-bold text-[#fe5126]">${task.title[0]}</div>
-                            <div>
-                                <p class="font-bold text-sm">${task.title}</p>
-                                <p class="text-[10px] text-slate-500 uppercase font-bold">${new Date(task.date + 'T' + task.time).toLocaleDateString('es-ES', {day:'numeric', month:'long'})} • ${task.time}</p>
-                            </div>
+                            <div><p class="font-bold text-sm">${task.title}</p><p class="text-[10px] text-slate-500 uppercase font-bold">${new Date(task.date + 'T' + task.time).toLocaleDateString('es-ES', {day:'numeric', month:'long'})} • ${task.time}</p></div>
                         </div>
                         <div class="flex items-center gap-4">
                             <span class="countdown-pill">${timeDiff}</span>
-                            <button onclick="deleteTask('${task.id}')" class="text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
+                            <button onclick="deleteTask('${task.id}')" class="text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                         </div>
                     `;
                     taskList.appendChild(row);
@@ -397,8 +611,7 @@
 
         function getTimeRemaining(task) {
             const end = new Date(task.date + 'T' + task.time);
-            const now = new Date();
-            const diff = end - now;
+            const diff = end - new Date();
             if(diff < 0) return "En curso";
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
@@ -411,8 +624,7 @@
         function updateCountdown(task) {
             const end = new Date(task.date + 'T' + task.time);
             const update = () => {
-                const now = new Date();
-                const diff = end - now;
+                const diff = end - new Date();
                 if(diff < 0) { document.getElementById('dash-next-countdown').textContent = "AHORA"; return; }
                 const h = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
                 const m = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0');
@@ -428,32 +640,26 @@
             const year = currentDate.getFullYear();
             const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             document.getElementById('mini-month').textContent = `${monthNames[month]} ${year}`;
-            
             container.innerHTML = '';
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            
             for (let i = 0; i < firstDay; i++) container.innerHTML += '<div></div>';
             for (let d = 1; d <= daysInMonth; d++) {
                 const isToday = new Date().getDate() === d && new Date().getMonth() === month && new Date().getFullYear() === year;
                 const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 const hasTasks = tasks.some(t => t.date === dateStr);
-                container.innerHTML += `<div class="text-[10px] py-2 flex flex-col items-center gap-1">
-                    <span class="${isToday ? 'text-[#fe5126] font-bold' : 'text-slate-400'}">${d}</span>
-                    ${hasTasks ? '<div class="w-1 h-1 bg-[#fe5126] rounded-full"></div>' : ''}
-                </div>`;
+                container.innerHTML += `<div class="text-[10px] py-2 flex flex-col items-center gap-1"><span class="${isToday ? 'text-[#fe5126] font-bold' : 'text-slate-400'}">${d}</span>${hasTasks ? '<div class="w-1 h-1 bg-[#fe5126] rounded-full"></div>' : ''}</div>`;
             }
         }
 
-        // --- CALENDAR LOGIC (EXISTING) ---
+        // --- CALENDAR LOGIC ---
         function populateYearDropdown() {
             const container = document.getElementById('yearDropdown');
             const currentYear = new Date().getFullYear();
             container.innerHTML = '';
             for (let i = currentYear - 5; i <= currentYear + 10; i++) {
                 const item = document.createElement('div');
-                item.className = 'dropdown-item';
-                item.textContent = i;
+                item.className = 'dropdown-item'; item.textContent = i;
                 item.onclick = (e) => { e.stopPropagation(); selectYear(i); };
                 container.appendChild(item);
             }
@@ -471,23 +677,19 @@
             const month = currentDate.getMonth();
             const year = currentDate.getFullYear();
             const today = new Date();
-            const isCurrentMonthYear = today.getMonth() === month && today.getFullYear() === year;
-            
             const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             document.getElementById('monthText').textContent = monthNames[month];
             document.getElementById('yearText').textContent = year;
-
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const prevMonthDays = new Date(year, month, 0).getDate();
             let startOffset = firstDay === 0 ? 6 : firstDay - 1;
-
             for (let i = startOffset; i > 0; i--) container.innerHTML += `<div class="day-card other-month"><span>${prevMonthDays - i + 1}</span></div>`;
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 const dayTasks = tasks.filter(t => t.date === dateStr);
                 const isSelected = selectedDate.getDate() === d && selectedDate.getMonth() === month && selectedDate.getFullYear() === year;
-                const isToday = isCurrentMonthYear && today.getDate() === d;
+                const isToday = today.getDate() === d && today.getMonth() === month && today.getFullYear() === year;
                 const card = document.createElement('div');
                 card.className = `day-card ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`;
                 card.innerHTML = `<div class="flex justify-between items-start"><span class="font-bold text-sm">${d}</span><div class="flex flex-wrap gap-1">${dayTasks.slice(0, 3).map(() => '<span class="task-indicator"></span>').join('')}</div></div>`;
@@ -498,19 +700,15 @@
         }
 
         function updateSelectedDateHeader() {
-            const options = { day: 'numeric', month: 'long', year: 'numeric' };
-            const el = document.getElementById('selectedFullDate');
-            if(el) el.textContent = selectedDate.toLocaleDateString('es-ES', options);
+            document.getElementById('selectedFullDate').textContent = selectedDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
             renderTaskList();
         }
 
         function renderTaskList() {
             const list = document.getElementById('taskList');
-            if(!list) return;
             const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
             const dayTasks = tasks.filter(t => t.date === dateStr).sort((a,b) => a.time.localeCompare(b.time));
-            list.innerHTML = '';
-            if (dayTasks.length === 0) { list.innerHTML = '<div class="text-center py-20 text-slate-600 italic text-sm">No hay eventos para este día.</div>'; return; }
+            list.innerHTML = dayTasks.length === 0 ? '<div class="text-center py-20 text-slate-600 italic text-sm">No hay eventos para este día.</div>' : '';
             dayTasks.forEach(task => {
                 const item = document.createElement('div');
                 item.className = 'glass-card p-5 rounded-2xl group relative hover:border-white/20 transition-all';
@@ -523,17 +721,11 @@
             const now = new Date();
             const dStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
             const tStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            
             for (let task of tasks) {
                 if (task.date === dStr && task.time === tStr && !task.alerted) {
                     showCustomAlert(task);
                     task.alerted = true;
-                    // Actualizar estado de alerta en el servidor
-                    await fetch(`${API_URL}/tasks`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(task)
-                    });
+                    await fetch(`${API_URL}/tasks`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(task) });
                 }
             }
         }
@@ -546,42 +738,16 @@
         
         document.getElementById('taskForm').onsubmit = async (e) => {
             e.preventDefault();
-            const data = {
-                id: editingTaskId || Date.now().toString(),
-                title: document.getElementById('taskTitle').value,
-                description: document.getElementById('taskDesc').value,
-                date: document.getElementById('taskDate').value,
-                time: document.getElementById('taskTime').value,
-                alerted: false
-            };
-
+            const data = { id: editingTaskId || Date.now().toString(), title: document.getElementById('taskTitle').value, description: document.getElementById('taskDesc').value, date: document.getElementById('taskDate').value, time: document.getElementById('taskTime').value, alerted: false };
             try {
-                await fetch(`${API_URL}/tasks`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                await loadTasks();
-                renderCalendar();
-                renderTaskList();
-                if(currentView === 'dashboard') renderDashboard();
-                closeModal();
-            } catch (err) {
-                alert('Error al guardar la tarea');
-            }
+                await fetch(`${API_URL}/tasks`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                await loadTasks(); renderCalendar(); renderTaskList(); if(currentView === 'dashboard') renderDashboard(); closeModal();
+            } catch (err) { alert('Error al guardar la tarea'); }
         };
 
         async function deleteTask(id) {
             if(!confirm('¿Estás seguro de eliminar este evento?')) return;
-            try {
-                await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE' });
-                await loadTasks();
-                renderCalendar();
-                renderTaskList();
-                if(currentView === 'dashboard') renderDashboard();
-            } catch (err) {
-                alert('Error al eliminar la tarea');
-            }
+            try { await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE' }); await loadTasks(); renderCalendar(); renderTaskList(); if(currentView === 'dashboard') renderDashboard(); } catch (err) { alert('Error al eliminar la tarea'); }
         }
         function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
         function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }

@@ -41,6 +41,27 @@ const initDB = async () => {
       );
     `);
 
+    // Tabla de Cotizaciones
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS quotes (
+        id SERIAL PRIMARY KEY,
+        company TEXT,
+        ruc TEXT,
+        client_name TEXT,
+        address TEXT,
+        quote_date DATE,
+        offer_validity TEXT,
+        valid_until DATE,
+        activities TEXT,
+        task_description TEXT,
+        location TEXT,
+        equipment TEXT,
+        items JSONB,
+        total_amount DECIMAL(10,2),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     await pool.query(`
       INSERT INTO users (username, password, full_name)
       VALUES ('juliana', 'fjatjuliana2026', 'Juliana')
@@ -90,6 +111,44 @@ app.post('/api/login', async (req, res) => {
     }
   } catch (err) {
     console.error('Error en /api/login:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Rutas de Cotizaciones
+app.get('/api/quotes', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM quotes ORDER BY created_at DESC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/quotes', async (req, res) => {
+  const { 
+    company, ruc, client_name, address, quote_date, 
+    offer_validity, valid_until, activities, task_description, 
+    location, equipment, items, total_amount 
+  } = req.body;
+  
+  try {
+    const query = `
+      INSERT INTO quotes (
+        company, ruc, client_name, address, quote_date, 
+        offer_validity, valid_until, activities, task_description, 
+        location, equipment, items, total_amount
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      RETURNING *;
+    `;
+    const values = [
+      company, ruc, client_name, address, quote_date, 
+      offer_validity, valid_until, activities, task_description, 
+      location, equipment, JSON.stringify(items), total_amount
+    ];
+    const result = await pool.query(query, values);
+    res.json(result.rows[0]);
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
