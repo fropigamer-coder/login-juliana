@@ -1,24 +1,26 @@
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.')); // Servir archivos HTML, CSS y JS desde la carpeta raíz
+
+// Servir archivos estáticos de forma explícita
+app.use(express.static(path.join(__dirname, '.')));
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false // Requerido para conexiones seguras con Neon/Render
+    rejectUnauthorized: false
   }
 });
 
 // Inicializar base de datos
 const initDB = async () => {
   try {
-    // Tabla de Tareas
     await pool.query(`
       CREATE TABLE IF NOT EXISTS tasks (
         id TEXT PRIMARY KEY,
@@ -30,7 +32,6 @@ const initDB = async () => {
       );
     `);
 
-    // Tabla de Usuarios
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -40,7 +41,6 @@ const initDB = async () => {
       );
     `);
 
-    // Crear usuario por defecto si no existe (Usuario: juliana / Pass: fjatjuliana2026)
     await pool.query(`
       INSERT INTO users (username, password, full_name)
       VALUES ('juliana', 'fjatjuliana2026', 'Juliana')
@@ -54,9 +54,16 @@ const initDB = async () => {
 };
 initDB();
 
+// Ruta raíz
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Ruta de Login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
+  console.log(`Intento de login para usuario: ${username}`);
+  
   try {
     const result = await pool.query(
       'SELECT * FROM users WHERE username = $1 AND password = $2',
@@ -65,11 +72,14 @@ app.post('/api/login', async (req, res) => {
 
     if (result.rows.length > 0) {
       const user = result.rows[0];
+      console.log(`Login exitoso: ${username}`);
       res.json({ success: true, user: { username: user.username, name: user.full_name } });
     } else {
+      console.log(`Login fallido: ${username} - Credenciales incorrectas`);
       res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
     }
   } catch (err) {
+    console.error('Error en /api/login:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -117,6 +127,10 @@ app.delete('/api/tasks/:id', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
