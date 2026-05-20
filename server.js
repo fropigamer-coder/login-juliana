@@ -64,6 +64,11 @@ app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
+// Ruta del Logo
+app.get('/1sdas.png', (req, res) => {
+  res.sendFile(path.join(__dirname, '1sdas.png'));
+});
+
 // Ruta de Login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
