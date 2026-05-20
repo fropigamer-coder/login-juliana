@@ -59,6 +59,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Ruta del Dashboard
+app.get('/dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
 // Ruta de Login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
