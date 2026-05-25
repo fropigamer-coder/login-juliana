@@ -822,6 +822,19 @@
             .bg-grid { background-size: 40px 40px; }
 
             #three-bg { left: 0; width: 100%; }
+
+            /* Fix mobile scrolling — allow page to scroll freely */
+            body { overflow-y: auto !important; -webkit-overflow-scrolling: touch; }
+            main { height: auto !important; min-height: 100dvh; overflow-y: visible !important; }
+            #view-events, #view-dashboard, #view-quotes { overflow-y: visible !important; height: auto !important; }
+            #view-events > div:first-child { max-height: none !important; overflow-y: visible !important; }
+            #view-events > div:last-child { max-height: none !important; overflow-y: visible !important; }
+            .calendar-grid { max-height: none !important; overflow-y: visible !important; }
+            #dash-tasks-list { max-height: none !important; overflow-y: visible !important; }
+            .card.h-\[500px\] { height: auto !important; min-height: auto !important; }
+            #view-dashboard .grid-cols-12 { height: auto !important; }
+            #quotesList { overflow-y: visible !important; max-height: none !important; }
+            .modal-content { max-height: 90vh; overflow-y: auto; }
         }
 
         /* --- Small phones (< 380px) --- */
