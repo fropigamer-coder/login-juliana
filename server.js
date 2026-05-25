@@ -195,6 +195,44 @@ app.post('/api/tasks', async (req, res) => {
   }
 });
 
+app.put('/api/quotes/:id', async (req, res) => {
+  const { id } = req.params;
+  const { 
+    company, ruc, client_name, address, quote_date, 
+    offer_validity, valid_until, activities, task_description, 
+    location, equipment, items, total_amount 
+  } = req.body;
+  
+  try {
+    const query = `
+      UPDATE quotes SET
+        company = $1, ruc = $2, client_name = $3, address = $4, quote_date = $5,
+        offer_validity = $6, valid_until = $7, activities = $8, task_description = $9,
+        location = $10, equipment = $11, items = $12, total_amount = $13
+      WHERE id = $14
+      RETURNING *;
+    `;
+    const values = [
+      company, ruc, client_name, address, quote_date,
+      offer_validity, valid_until, activities, task_description,
+      location, equipment, JSON.stringify(items), total_amount, id
+    ];
+    const result = await pool.query(query, values);
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/quotes/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM quotes WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.delete('/api/tasks/:id', async (req, res) => {
   try {
     await pool.query('DELETE FROM tasks WHERE id = $1', [req.params.id]);
