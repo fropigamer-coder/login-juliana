@@ -17,46 +17,494 @@
     }
     </script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #1a1c26; color: #e2e8f0; }
-        .glass-card { background: #232632; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; }
-        .sidebar { background: #1a1c26; width: 260px; border-r: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 1; }
-        .active-nav { background: rgba(254, 81, 38, 0.1); border-right: 3px solid #fe5126; color: white; }
-        
-        /* Calendar Styles */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .day-card { background: #2d303e; border-radius: 12px; min-height: 80px; padding: 10px; transition: all 0.3s; border: 1px solid transparent; }
-        .day-card:hover { border-color: #fe5126; }
-        .day-card.selected { background: #fe5126; color: white; }
-        .day-card.selected .task-indicator { background: white; }
-        .day-card.today { border: 2px solid #fe5126; }
-        .day-card.other-month { opacity: 0.1; pointer-events: none; }
-        .task-indicator { width: 5px; height: 5px; border-radius: 50%; background: #fe5126; display: inline-block; margin-right: 3px; }
+        /* ============================================
+           FJAT MECANINDUSTRIA — Design System
+           Industrial control panel aesthetic
+           ============================================ */
 
-        /* Custom Dropdown Styles */
-        .custom-dropdown { position: relative; display: inline-block; }
-        .dropdown-content { 
-            display: none; position: absolute; top: 120%; left: 0; 
-            background: #232632; min-width: 160px; border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 16px; z-index: 300; max-height: 300px; overflow-y: auto; 
+        /* --- Tokens --- */
+        :root {
+            --brand: #fe5126;
+            --brand-hover: #e84720;
+            --brand-subtle: rgba(254, 81, 38, 0.12);
+            --brand-glow: rgba(254, 81, 38, 0.25);
+
+            --accent: #4a6cf7;
+            --accent-subtle: rgba(74, 108, 247, 0.12);
+
+            --surface-base: #1a1c26;
+            --surface-raised: #232632;
+            --surface-overlay: #2a2d3a;
+            --surface-hover: #2f3340;
+
+            --fg-primary: #e8ecf4;
+            --fg-secondary: #94a3b8;
+            --fg-tertiary: #64748b;
+            --fg-muted: #475569;
+
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --border-default: rgba(255, 255, 255, 0.07);
+            --border-medium: rgba(255, 255, 255, 0.12);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 12px;
+            --space-lg: 16px;
+            --space-xl: 24px;
+            --space-2xl: 32px;
+            --space-3xl: 40px;
+
+            --sidebar-width: 260px;
+            --topbar-height: 72px;
+
+            --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .dropdown-content.show { display: block; }
-        .dropdown-item { padding: 10px 16px; color: #94a3b8; cursor: pointer; transition: all 0.2s; font-size: 14px; }
-        .dropdown-item:hover { background: rgba(255,255,255,0.05); color: white; }
 
-        /* Dashboard specific */
-        .task-row { border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .task-row:last-child { border-bottom: none; }
-        .countdown-pill { background: rgba(254, 81, 38, 0.1); color: #fe5126; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; }
-        
-        /* Alert Animation */
-        #customAlert.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        /* --- Base --- */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--surface-base);
+            color: var(--fg-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #3d4154; border-radius: 10px; }
+        /* --- Scrollbar (fine-tuned industrial) --- */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--fg-tertiary); }
 
-        /* Quotes Table Styles */
-        .quote-item-row input { background: transparent; border: none; width: 100%; outline: none; color: white; font-size: 12px; }
-        .quote-item-row td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        /* --- Surface Cards --- */
+        .card {
+            background: var(--surface-raised);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            transition: border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+        }
+        .card:hover {
+            border-color: var(--border-medium);
+        }
+        .card-elevated {
+            background: var(--surface-overlay);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-xl);
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--surface-base);
+            border-right: 1px solid var(--border-default);
+            position: relative;
+            z-index: 2;
+        }
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            width: 100%;
+            padding: 10px var(--space-lg);
+            border-radius: var(--radius-md);
+            color: var(--fg-tertiary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s var(--ease-out);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+        }
+        .nav-btn:hover {
+            color: var(--fg-primary);
+            background: var(--surface-hover);
+        }
+        .nav-btn.active {
+            color: var(--brand);
+            background: var(--brand-subtle);
+            font-weight: 600;
+        }
+        .nav-btn.active svg {
+            color: var(--brand);
+        }
+        .nav-btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            transition: color 0.2s var(--ease-out);
+        }
+
+        /* --- Top Bar --- */
+        .topbar {
+            height: var(--topbar-height);
+            border-bottom: 1px solid var(--border-default);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-3xl);
+            flex-shrink: 0;
+        }
+
+        /* --- Buttons --- */
+        .btn-primary {
+            background: var(--brand);
+            color: white;
+            padding: 10px 22px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .btn-primary:hover {
+            background: var(--brand-hover);
+            transform: translateY(-1px);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--fg-secondary);
+            padding: 10px 22px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid var(--border-medium);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out);
+        }
+        .btn-secondary:hover {
+            color: var(--fg-primary);
+            border-color: var(--fg-tertiary);
+            background: var(--surface-hover);
+        }
+
+        /* --- Inputs --- */
+        .input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            color: var(--fg-primary);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s var(--ease-out);
+        }
+        .input:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px var(--brand-subtle);
+        }
+        .input::placeholder {
+            color: var(--fg-muted);
+        }
+        textarea.input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* --- Calendar --- */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+        .day-card {
+            background: var(--surface-raised);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            min-height: 76px;
+            padding: var(--space-sm) var(--space-md);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out);
+        }
+        .day-card:hover {
+            border-color: var(--brand);
+            background: var(--surface-overlay);
+        }
+        .day-card.selected {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: white;
+        }
+        .day-card.selected .task-indicator {
+            background: white;
+            opacity: 0.8;
+        }
+        .day-card.today {
+            border-color: var(--brand);
+            border-width: 1.5px;
+        }
+        .day-card.today:not(.selected) {
+            background: rgba(254, 81, 38, 0.06);
+        }
+        .day-card.other-month {
+            opacity: 0.12;
+            pointer-events: none;
+        }
+        .day-card .day-number {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .task-indicator {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--brand);
+            display: inline-block;
+        }
+
+        /* --- Dropdowns --- */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-trigger {
+            background: var(--surface-raised);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: 8px 14px;
+            color: var(--fg-primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            transition: all 0.15s var(--ease-out);
+        }
+        .dropdown-trigger:hover {
+            background: var(--surface-overlay);
+            border-color: var(--border-medium);
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            background: var(--surface-overlay);
+            min-width: 180px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-md);
+            z-index: 300;
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+        .dropdown-content.show {
+            display: block;
+        }
+        .dropdown-item {
+            padding: 8px 12px;
+            color: var(--fg-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s var(--ease-out);
+            font-size: 13px;
+        }
+        .dropdown-item:hover {
+            background: var(--surface-hover);
+            color: var(--fg-primary);
+        }
+
+        /* --- Dashboard Metrics --- */
+        .metric-hero {
+            background: linear-gradient(135deg, var(--brand), #ff8c6b);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            pointer-events: none;
+        }
+        .metric-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: 10%;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            pointer-events: none;
+        }
+        .task-row {
+            padding: 14px var(--space-lg);
+            border-radius: var(--radius-md);
+            transition: all 0.2s var(--ease-out);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .task-row:hover {
+            background: var(--surface-hover);
+        }
+        .countdown-pill {
+            background: var(--brand-subtle);
+            color: var(--brand);
+            padding: 2px 10px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        /* --- Quote Cards --- */
+        .quote-card {
+            background: var(--surface-raised);
+            border: 1px solid var(--border-default);
+            border-left: 3px solid var(--brand);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            transition: all 0.2s var(--ease-out);
+        }
+        .quote-card:hover {
+            background: var(--surface-overlay);
+            border-color: var(--border-medium);
+            transform: translateY(-2px);
+        }
+
+        /* --- Quote Table (modal) --- */
+        .quote-item-row td {
+            padding: 6px 10px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .quote-item-row input {
+            background: transparent;
+            border: none;
+            width: 100%;
+            outline: none;
+            color: var(--fg-primary);
+            font-size: 13px;
+        }
+        .quote-item-row input:focus {
+            color: white;
+        }
+
+        /* --- Icon Buttons --- */
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out);
+            color: var(--fg-tertiary);
+        }
+        .icon-btn-excel { background: rgba(74, 108, 247, 0.08); }
+        .icon-btn-excel:hover { background: #4a6cf7; color: white; }
+        .icon-btn-pdf { background: rgba(254, 81, 38, 0.08); }
+        .icon-btn-pdf:hover { background: var(--brand); color: white; }
+
+        /* --- Tags --- */
+        .tag {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            color: var(--fg-tertiary);
+            background: rgba(0,0,0,0.15);
+        }
+
+        /* --- Modal --- */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-backdrop.show {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--surface-raised);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-2xl);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.25s var(--ease-out);
+        }
+        .modal-content.open {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* --- Custom Alert (Toast) --- */
+        #customAlert.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* --- Table (admin style) --- */
+        .table-header {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--fg-tertiary);
+            background: rgba(0,0,0,0.15);
+        }
+        .table-header th {
+            padding: 10px 12px;
+        }
+
+        /* --- Icon container --- */
+        .icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* --- Utility --- */
+        .text-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--fg-tertiary);
+        }
+        .divider {
+            height: 1px;
+            background: var(--border-default);
+        }
     </style>
 </head>
 <body class="flex min-h-screen overflow-hidden" onclick="closeAllDropdowns()">
@@ -66,22 +514,22 @@
         <div class="flex items-center gap-3 mb-10 px-2">
             <img src="1sdas.png" alt="Logo" class="w-8 h-8 object-contain">
             <div>
-                <h1 class="font-bold text-lg leading-none">FJAT</h1>
+                <h1 class="font-bold text-lg leading-none tracking-tight">FJAT</h1>
                 <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">Mecanindustria</p>
             </div>
         </div>
 
         <nav class="space-y-2 flex-grow">
-            <button onclick="switchView('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Dashboard
             </button>
-            <button onclick="switchView('events')" id="nav-events" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition active-nav">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z"></path></svg>
+            <button onclick="switchView('events')" id="nav-events" class="nav-btn active">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z"></path></svg>
                 Eventos
             </button>
-            <button onclick="switchView('quotes')" id="nav-quotes" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <button onclick="switchView('quotes')" id="nav-quotes" class="nav-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 Cotizaciones
             </button>
         </nav>
@@ -103,13 +551,12 @@
     <!-- Main Content -->
     <main class="flex-grow flex flex-col h-screen overflow-hidden" style="position: relative; z-index: 1;">
         <!-- Top Bar -->
-        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 shrink-0">
-            <h2 id="view-title" class="text-xl font-bold">Eventos</h2>
-            <div class="flex items-center gap-6">
-                <button onclick="openModal()" class="bg-[#fe5126] text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-orange-500/20 active:scale-95 transition-all">
-                    + Nuevo Pendiente
-                </button>
-            </div>
+        <header class="topbar">
+            <h2 id="view-title" class="text-xl font-bold tracking-tight">Eventos</h2>
+            <button onclick="openModal()" class="btn-primary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Nuevo Pendiente
+            </button>
         </header>
 
         <!-- View: EVENTS -->
@@ -117,8 +564,8 @@
             <div class="flex-grow flex flex-col min-w-0">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex gap-2">
-                        <div class="custom-dropdown">
-                            <button onclick="toggleDropdown(event, 'monthDropdown')" id="monthBtn" class="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl border border-white/5 text-white font-bold text-xl transition flex items-center gap-2">
+                        <div class="dropdown">
+                            <button onclick="toggleDropdown(event, 'monthDropdown')" id="monthBtn" class="dropdown-trigger">
                                 <span id="monthText">Enero</span>
                                 <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
@@ -137,8 +584,8 @@
                                 <div class="dropdown-item" onclick="selectMonth(11)">Diciembre</div>
                             </div>
                         </div>
-                        <div class="custom-dropdown">
-                            <button onclick="toggleDropdown(event, 'yearDropdown')" id="yearBtn" class="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl border border-white/5 text-white font-bold text-xl transition flex items-center gap-2">
+                        <div class="dropdown">
+                            <button onclick="toggleDropdown(event, 'yearDropdown')" id="yearBtn" class="dropdown-trigger">
                                 <span id="yearText">2026</span>
                                 <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
@@ -146,8 +593,8 @@
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="prevMonth()" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-400 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
-                        <button onclick="nextMonth()" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-400 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
+                        <button onclick="prevMonth()" class="btn-secondary p-2 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
+                        <button onclick="nextMonth()" class="btn-secondary p-2 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
                     </div>
                 </div>
                 <div class="grid grid-cols-7 gap-4 mb-2">
@@ -163,7 +610,7 @@
             </div>
             <div class="w-[380px] shrink-0 flex flex-col">
                 <div class="mb-6">
-                    <h3 class="text-lg font-bold">Eventos del Día</h3>
+                    <h3 class="text-lg font-bold tracking-tight">Eventos del Día</h3>
                     <p id="selectedFullDate" class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold"></p>
                 </div>
                 <div id="taskList" class="space-y-4 overflow-y-auto flex-grow pr-2"></div>
@@ -174,44 +621,44 @@
         <div id="view-dashboard" class="hidden flex-grow overflow-y-auto p-8">
             <div class="grid grid-cols-12 gap-8 h-full">
                 <div class="col-span-8 space-y-8">
-                    <div id="main-event-card" class="glass-card p-8 bg-gradient-to-br from-[#fe5126] to-[#ff8c6b] text-white">
-                        <div class="flex justify-between items-start mb-6">
+                    <div id="main-event-card" class="metric-hero">
+                        <div class="flex justify-between items-start mb-6 relative z-10">
                             <div>
-                                <span class="text-[10px] font-bold uppercase tracking-widest opacity-80">Próximo Evento</span>
-                                <h3 id="dash-next-title" class="text-3xl font-bold mt-1">Sin eventos próximos</h3>
+                                <span class="text-label opacity-80">Próximo Evento</span>
+                                <h3 id="dash-next-title" class="text-3xl font-bold mt-2 tracking-tight">Sin eventos próximos</h3>
                             </div>
-                            <div class="bg-white/20 p-3 rounded-2xl"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"></path></svg></div>
+                            <div class="bg-white/15 p-3 rounded-xl backdrop-blur-sm"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"></path></svg></div>
                         </div>
-                        <div class="flex items-center gap-6">
+                        <div class="flex items-center gap-6 relative z-10">
                             <div class="flex flex-col">
-                                <span class="text-xs opacity-80">Tiempo restante</span>
-                                <span id="dash-next-countdown" class="text-xl font-bold">--:--:--</span>
+                                <span class="text-xs opacity-70 font-medium">Tiempo restante</span>
+                                <span id="dash-next-countdown" class="text-2xl font-bold tabular-nums mt-1">--:--:--</span>
                             </div>
-                            <div class="h-10 w-[1px] bg-white/20"></div>
+                            <div class="h-10 w-px bg-white/15"></div>
                             <div class="flex flex-col">
-                                <span class="text-xs opacity-80">Fecha</span>
-                                <span id="dash-next-date" class="text-xl font-bold">-- --</span>
+                                <span class="text-xs opacity-70 font-medium">Fecha</span>
+                                <span id="dash-next-date" class="text-2xl font-bold mt-1">-- --</span>
                             </div>
                         </div>
                     </div>
-                    <div class="glass-card p-8 flex flex-col h-[500px]">
-                        <div class="flex justify-between items-center mb-8">
-                            <h3 class="text-xl font-bold">Mis Pendientes <span id="dash-task-count" class="text-slate-500 text-sm ml-2">(0)</span></h3>
+                    <div class="card p-8 flex flex-col h-[500px]">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-bold tracking-tight">Mis Pendientes <span id="dash-task-count" class="text-sm font-medium text-[var(--fg-tertiary)] ml-2">(0)</span></h3>
                         </div>
-                        <div id="dash-tasks-list" class="space-y-2 overflow-y-auto pr-2"></div>
+                        <div id="dash-tasks-list" class="space-y-1 overflow-y-auto flex-grow pr-2"></div>
                     </div>
                 </div>
                 <div class="col-span-4 space-y-8">
-                    <div class="glass-card p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h4 id="mini-month" class="font-bold">Abril 2026</h4>
-                            <div class="flex gap-2">
-                                <button onclick="prevMonth()" class="text-slate-500 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
-                                <button onclick="nextMonth()" class="text-slate-500 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-5">
+                            <h4 id="mini-month" class="font-bold text-sm">Abril 2026</h4>
+                            <div class="flex gap-1">
+                                <button onclick="prevMonth()" class="btn-secondary p-1.5 rounded-lg"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
+                                <button onclick="nextMonth()" class="btn-secondary p-1.5 rounded-lg"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
                             </div>
                         </div>
-                        <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-slate-500 font-bold mb-4">
-                            <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                        <div class="grid grid-cols-7 gap-1 text-center" style="font-size:10px;font-weight:700;color:var(--fg-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">
+                            <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
                         </div>
                         <div id="mini-calendar" class="grid grid-cols-7 gap-1"></div>
                     </div>
@@ -221,17 +668,17 @@
 
         <!-- View: QUOTES -->
         <div id="view-quotes" class="hidden flex-grow overflow-y-auto p-8">
-            <div class="glass-card p-8 h-full flex flex-col">
-                <div class="flex flex-wrap items-center justify-between gap-6 mb-8">
-                    <div class="flex items-center gap-4 flex-grow max-w-2xl">
+            <div class="card p-8 h-full flex flex-col">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+                    <div class="flex items-center gap-3 flex-grow max-w-xl">
                         <div class="relative flex-grow">
-                            <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            <input type="text" id="quoteSearchName" oninput="renderQuotes()" placeholder="Buscar por cliente/empresa..." class="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 outline-none focus:border-[#fe5126] transition text-white text-sm">
+                            <svg class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2" style="color:var(--fg-tertiary)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <input type="text" id="quoteSearchName" oninput="renderQuotes()" placeholder="Buscar por cliente o empresa..." class="input pl-11">
                         </div>
-                        <input type="date" id="quoteSearchDate" oninput="renderQuotes()" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#fe5126] transition text-slate-400 text-sm">
+                        <input type="date" id="quoteSearchDate" oninput="renderQuotes()" class="input" style="width:auto;min-width:140px;">
                     </div>
-                    <button onclick="openQuoteModal()" class="bg-[#fe5126] text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-orange-500/20 active:scale-95 transition-all flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <button onclick="openQuoteModal()" class="btn-primary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Crear Cotización
                     </button>
                 </div>
@@ -248,110 +695,117 @@
         </div>
     </main>
 
-    <!-- Task Modal (Existing) -->
-    <div id="taskModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
-        <div class="bg-[#232632] w-[450px] rounded-3xl p-8 border border-white/10 shadow-2xl scale-95 opacity-0 transition-all duration-300 transform" id="modalContent">
-            <h3 class="text-xl font-bold mb-6 text-white">Añadir Nuevo Evento</h3>
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal-backdrop">
+        <div class="modal-content w-[440px]" id="modalContent">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold tracking-tight text-white">Añadir Evento</h3>
+                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 transition" style="color:var(--fg-tertiary)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
             <form id="taskForm" class="space-y-4">
-                <input type="text" id="taskTitle" required placeholder="Título del evento" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#fe5126] transition text-white">
-                <textarea id="taskDesc" rows="3" placeholder="Descripción corta..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#fe5126] transition text-white"></textarea>
+                <input type="text" id="taskTitle" required placeholder="Título del evento" class="input">
+                <textarea id="taskDesc" rows="3" placeholder="Descripción corta..." class="input"></textarea>
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="date" id="taskDate" required class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#fe5126] transition text-slate-400">
-                    <input type="time" id="taskTime" required class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#fe5126] transition text-slate-400">
+                    <input type="date" id="taskDate" required class="input">
+                    <input type="time" id="taskTime" required class="input">
                 </div>
                 <div class="flex gap-3 pt-4">
-                    <button type="button" onclick="closeModal()" class="flex-grow py-3 rounded-xl font-bold text-slate-400 hover:bg-white/5 transition">Cancelar</button>
-                    <button type="submit" class="flex-grow py-3 bg-[#fe5126] rounded-xl font-bold text-white shadow-lg shadow-orange-500/20 active:scale-95 transition-all">Crear Evento</button>
+                    <button type="button" onclick="closeModal()" class="btn-secondary flex-grow">Cancelar</button>
+                    <button type="submit" class="btn-primary flex-grow justify-center">Crear Evento</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Quote Modal (New Large) -->
-    <div id="quoteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
-        <div class="bg-[#232632] w-[90%] max-w-5xl max-h-[90vh] rounded-3xl p-8 border border-white/10 shadow-2xl overflow-y-auto scale-95 opacity-0 transition-all duration-300 transform" id="quoteModalContent">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="text-2xl font-bold text-white">Nueva Cotización</h3>
-                <button onclick="closeQuoteModal()" class="text-slate-500 hover:text-white transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <!-- Quote Modal -->
+    <div id="quoteModal" class="modal-backdrop">
+        <div class="modal-content w-[90%] max-w-5xl max-h-[90vh] overflow-y-auto" id="quoteModalContent">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-2xl font-bold tracking-tight text-white">Nueva Cotización</h3>
+                <button onclick="closeQuoteModal()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 transition" style="color:var(--fg-tertiary)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
             
-            <form id="quoteForm" class="space-y-8">
+            <form id="quoteForm" class="space-y-6">
                 <!-- Información del Cliente -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Empresa del Trabajo</label>
-                        <input type="text" name="company" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-label">Empresa del Trabajo</label>
+                        <input type="text" name="company" required class="input">
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">RUC</label>
-                        <input type="text" name="ruc" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    <div class="space-y-1.5">
+                        <label class="text-label">RUC</label>
+                        <input type="text" name="ruc" required class="input">
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Señor(a)</label>
-                        <input type="text" name="client_name" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    <div class="space-y-1.5">
+                        <label class="text-label">Señor(a)</label>
+                        <input type="text" name="client_name" required class="input">
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Dirección</label>
-                        <input type="text" name="address" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    <div class="space-y-1.5">
+                        <label class="text-label">Dirección</label>
+                        <input type="text" name="address" required class="input">
                     </div>
                 </div>
 
                 <!-- Fechas y Validez -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Fecha</label>
-                        <input type="date" name="quote_date" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-label">Fecha</label>
+                        <input type="date" name="quote_date" required class="input">
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Validez de Oferta</label>
-                        <input type="text" name="offer_validity" placeholder="Ej: 15 días" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    <div class="space-y-1.5">
+                        <label class="text-label">Validez de Oferta</label>
+                        <input type="text" name="offer_validity" placeholder="Ej: 15 días" class="input">
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Válido hasta</label>
-                        <input type="date" name="valid_until" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    <div class="space-y-1.5">
+                        <label class="text-label">Válido hasta</label>
+                        <input type="date" name="valid_until" class="input">
                     </div>
                 </div>
 
                 <!-- Detalles del Trabajo -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Actividades / Lo que se realiza</label>
-                        <textarea name="activities" rows="2" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white"></textarea>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-label">Actividades / Lo que se realiza</label>
+                        <textarea name="activities" rows="2" class="input"></textarea>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Descripción General</label>
-                        <textarea name="task_description" rows="2" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white"></textarea>
+                    <div class="space-y-1.5">
+                        <label class="text-label">Descripción General</label>
+                        <textarea name="task_description" rows="2" class="input"></textarea>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Ubicación</label>
-                        <input type="text" name="location" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-label">Ubicación</label>
+                        <input type="text" name="location" class="input">
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Equipo</label>
-                        <input type="text" name="equipment" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-[#fe5126] transition text-white">
+                    <div class="space-y-1.5">
+                        <label class="text-label">Equipo</label>
+                        <input type="text" name="equipment" class="input">
                     </div>
                 </div>
 
                 <!-- Tabla de Items -->
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h4 class="text-sm font-bold text-white uppercase tracking-wider">Items de Cotización</h4>
-                        <button type="button" onclick="addQuoteItem()" class="text-[#fe5126] text-xs font-bold hover:underline">+ Agregar Item</button>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-bold text-white tracking-tight">Items de Cotización</h4>
+                        <button type="button" onclick="addQuoteItem()" class="text-xs font-bold" style="color:var(--brand)">+ Agregar Item</button>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto rounded-xl border" style="border-color:var(--border-default)">
                         <table class="w-full text-left">
-                            <thead class="text-[10px] font-bold uppercase text-slate-500 bg-white/5">
+                            <thead class="table-header">
                                 <tr>
-                                    <th class="p-3">Item</th>
-                                    <th class="p-3">Descripción</th>
-                                    <th class="p-3">Und</th>
-                                    <th class="p-3">Cantidad</th>
-                                    <th class="p-3">P. Unitario</th>
-                                    <th class="p-3">Parcial</th>
-                                    <th class="p-3"></th>
+                                    <th>Item</th>
+                                    <th>Descripción</th>
+                                    <th>Und</th>
+                                    <th>Cantidad</th>
+                                    <th>P. Unitario</th>
+                                    <th>Parcial</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody id="quoteItemsTableBody">
@@ -359,17 +813,17 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="flex justify-end pt-4">
-                        <div class="bg-white/5 p-4 rounded-2xl min-w-[200px]">
-                            <p class="text-[10px] font-bold uppercase text-slate-500 mb-1">Total General</p>
-                            <p id="quoteTotalDisplay" class="text-2xl font-bold text-[#fe5126]">S/ 0.00</p>
+                    <div class="flex justify-end pt-2">
+                        <div class="rounded-xl p-4 min-w-[200px]" style="background:var(--brand-subtle);border:1px solid rgba(254,81,38,0.15);">
+                            <p class="text-label mb-1" style="color:var(--brand)">Total General</p>
+                            <p id="quoteTotalDisplay" class="text-2xl font-bold" style="color:var(--brand)">S/ 0.00</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex gap-4 pt-6">
-                    <button type="button" onclick="closeQuoteModal()" class="flex-grow py-3 rounded-xl font-bold text-slate-400 hover:bg-white/5 transition">Cancelar</button>
-                    <button type="submit" class="flex-grow py-3 bg-[#fe5126] rounded-xl font-bold text-white shadow-lg shadow-orange-500/20 active:scale-95 transition-all">Guardar Cotización</button>
+                <div class="flex gap-4 pt-4">
+                    <button type="button" onclick="closeQuoteModal()" class="btn-secondary flex-grow">Cancelar</button>
+                    <button type="submit" class="btn-primary flex-grow justify-center">Guardar Cotización</button>
                 </div>
             </form>
         </div>
@@ -379,19 +833,19 @@
     <div id="three-bg" class="fixed inset-0 z-0 pointer-events-none" style="position: fixed; top: 0; left: 260px; width: calc(100% - 260px); height: 100%; z-index: 0;"></div>
 
     <!-- Custom Alert (Toast) -->
-    <div id="customAlert" class="fixed bottom-10 right-10 z-[200] transform translate-y-20 opacity-0 pointer-events-none transition-all duration-500 ease-out">
-        <div class="glass-card p-6 rounded-3xl border-l-4 border-[#fe5126] shadow-2xl w-80">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="bg-orange-500/20 p-2 rounded-xl text-[#fe5126]">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div id="customAlert" class="fixed bottom-10 right-10 z-[200] transform translate-y-20 opacity-0 pointer-events-none transition-all duration-500" style="transition-timing-function:var(--ease-out)">
+        <div class="card-elevated p-5 w-80" style="border-left:3px solid var(--brand);">
+            <div class="flex items-start gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:var(--brand-subtle)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--brand)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
-                <div>
-                    <p class="text-[10px] font-bold text-orange-400 uppercase tracking-widest">¡Es la hora!</p>
-                    <h4 id="alertTitle" class="font-bold text-white leading-tight"></h4>
+                <div class="flex-grow min-w-0">
+                    <p class="text-label" style="color:var(--brand)">¡Es la hora!</p>
+                    <h4 id="alertTitle" class="font-bold text-white leading-tight mt-0.5"></h4>
                 </div>
             </div>
-            <p id="alertDesc" class="text-xs text-slate-400 mb-4 line-clamp-2"></p>
-            <button onclick="dismissAlert()" class="w-full py-2 bg-[#fe5126] text-white text-xs font-bold rounded-xl shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition">Entendido</button>
+            <p id="alertDesc" class="text-sm" style="color:var(--fg-secondary);margin-bottom:12px;"></p>
+            <button onclick="dismissAlert()" class="btn-primary w-full justify-center text-xs py-2">Entendido</button>
         </div>
     </div>
 
@@ -585,10 +1039,11 @@
 
             if (filtered.length === 0) {
                 list.innerHTML = `
-                    <div class="flex flex-col items-center justify-center text-slate-600 italic h-full">
-                        <div class="text-center">
+                    <div class="flex flex-col items-center justify-center h-full">
+                        <div class="text-center" style="color:var(--fg-tertiary)">
                             <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <p class="text-lg">No hay cotizaciones que coincidan</p>
+                            <p class="text-sm font-medium">No hay cotizaciones que coincidan</p>
+                            <p class="text-xs mt-2" style="color:var(--fg-muted)">Prueba con otros filtros o crea una nueva</p>
                         </div>
                     </div>
                 `;
@@ -596,29 +1051,36 @@
             }
 
             list.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    ${filtered.map(q => `
-                        <div class="glass-card p-6 border-l-4 border-[#fe5126] hover:bg-white/5 transition group">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    ${filtered.map(q => {
+                        const qItems = typeof q.items === 'string' ? JSON.parse(q.items) : (q.items || []);
+                        return `
+                        <div class="quote-card group">
                             <div class="flex justify-between items-start mb-4">
-                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">${new Date(q.quote_date).toLocaleDateString()}</span>
-                                <div class="flex gap-2">
-                                    <button onclick="exportToExcel('${q.id}')" class="p-1.5 bg-green-500/10 text-green-500 rounded-lg opacity-0 group-hover:opacity-100 transition hover:bg-green-500 hover:text-white" title="Descargar Excel">
+                                <span class="text-label">${new Date(q.quote_date).toLocaleDateString()}</span>
+                                <div class="flex gap-1.5">
+                                    <button onclick="exportToExcel('${q.id}')" class="icon-btn icon-btn-excel" title="Descargar Excel">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                     </button>
-                                    <button onclick="exportToPDF('${q.id}')" class="p-1.5 bg-red-500/10 text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition hover:bg-red-500 hover:text-white" title="Descargar PDF">
+                                    <button onclick="exportToPDF('${q.id}')" class="icon-btn icon-btn-pdf" title="Descargar PDF">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                                     </button>
-                                    <span class="bg-[#fe5126]/10 text-[#fe5126] px-2 py-1 rounded text-[10px] font-bold">S/ ${q.total_amount}</span>
                                 </div>
                             </div>
-                            <h4 class="font-bold text-lg mb-1">${q.company}</h4>
-                            <p class="text-xs text-slate-400 mb-4">${q.client_name}</p>
-                            <div class="text-[10px] text-slate-500 uppercase font-bold flex gap-2">
-                                <span class="bg-white/5 px-2 py-1 rounded">${q.location || 'N/A'}</span>
-                                <span class="bg-white/5 px-2 py-1 rounded">${q.ruc}</span>
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0 flex-grow">
+                                    <h4 class="font-bold text-base leading-tight truncate">${q.company}</h4>
+                                    <p class="text-xs mt-1" style="color:var(--fg-secondary)">${q.client_name}</p>
+                                </div>
+                                <span class="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full" style="color:var(--brand);background:var(--brand-subtle)">S/ ${q.total_amount}</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-4 pt-3" style="border-top:1px solid var(--border-subtle)">
+                                <span class="tag">${q.location || 'N/A'}</span>
+                                <span class="tag">${q.ruc}</span>
+                                ${qItems.length > 0 ? `<span class="tag">${qItems.length} items</span>` : ''}
                             </div>
                         </div>
-                    `).join('')}
+                    `}).join('')}
                 </div>
             `;
         }
@@ -763,16 +1225,22 @@
                 updateCountdown(next);
                 sortedTasks.forEach(task => {
                     const row = document.createElement('div');
-                    row.className = 'task-row py-4 flex items-center justify-between group px-2 hover:bg-white/5 rounded-xl transition';
+                    row.className = 'task-row';
                     const timeDiff = getTimeRemaining(task);
+                    const initials = task.title.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
                     row.innerHTML = `
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-xl glass-card flex items-center justify-center font-bold text-[#fe5126]">${task.title[0]}</div>
-                            <div><p class="font-bold text-sm">${task.title}</p><p class="text-[10px] text-slate-500 uppercase font-bold">${new Date(task.date + 'T' + task.time).toLocaleDateString('es-ES', {day:'numeric', month:'long'})} • ${task.time}</p></div>
+                        <div class="flex items-center gap-4 min-w-0 flex-grow">
+                            <div class="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center text-sm font-bold" style="background:var(--brand-subtle);color:var(--brand)">${initials}</div>
+                            <div class="min-w-0">
+                                <p class="font-bold text-sm truncate">${task.title}</p>
+                                <p class="text-[10px] font-semibold mt-0.5" style="color:var(--fg-tertiary)">${new Date(task.date + 'T' + task.time).toLocaleDateString('es-ES', {day:'numeric', month:'short'})} • ${task.time}</p>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-3 shrink-0">
                             <span class="countdown-pill">${timeDiff}</span>
-                            <button onclick="deleteTask('${task.id}')" class="text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                            <button onclick="deleteTask('${task.id}')" class="w-7 h-7 flex items-center justify-center rounded-lg transition-all opacity-0 group-hover:opacity-100" style="color:var(--fg-tertiary);background:transparent" onmouseover="this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.color='var(--fg-tertiary)';this.style.background='transparent'">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
                         </div>
                     `;
                     taskList.appendChild(row);
@@ -781,7 +1249,7 @@
                 document.getElementById('dash-next-title').textContent = 'Sin eventos próximos';
                 document.getElementById('dash-next-countdown').textContent = '--:--:--';
                 document.getElementById('dash-next-date').textContent = '-- --';
-                taskList.innerHTML = '<div class="text-center py-20 text-slate-600 italic text-sm">No hay pendientes próximos.</div>';
+                taskList.innerHTML = '<div class="flex flex-col items-center justify-center py-16 text-center"><div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style="background:var(--border-subtle)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--fg-tertiary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg></div><p class="text-sm font-medium" style="color:var(--fg-tertiary)">Todo al día</p><p class="text-xs mt-1" style="color:var(--fg-muted)">No hay pendientes próximos</p></div>';
             }
             renderMiniCalendar();
         }
@@ -814,8 +1282,12 @@
             for (let i = 0; i < firstDay; i++) container.innerHTML += '<div></div>';
             for (let d = 1; d <= daysInMonth; d++) {
                 const isToday = new Date().getDate() === d && new Date().getMonth() === month && new Date().getFullYear() === year;
+                const isSelected = selectedDate.getDate() === d && selectedDate.getMonth() === month && selectedDate.getFullYear() === year;
                 const hasTasks = tasks.some(t => t.date === `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
-                container.innerHTML += `<div class="text-[10px] py-2 flex flex-col items-center gap-1"><span class="${isToday ? 'text-[#fe5126] font-bold' : 'text-slate-400'}">${d}</span>${hasTasks ? '<div class="w-1 h-1 bg-[#fe5126] rounded-full"></div>' : ''}</div>`;
+                const dayStyle = isSelected ? `background:var(--brand);color:white;font-weight:700;border-radius:6px` : 
+                                isToday ? `color:var(--brand);font-weight:700` : 
+                                `color:var(--fg-secondary)`;
+                container.innerHTML += `<div class="text-[11px] py-1.5 flex flex-col items-center gap-0.5 cursor-pointer transition-all hover:opacity-80" onclick="selectedDate=new Date(${year},${month},${d}); renderMiniCalendar(); updateSelectedDateHeader(); renderCalendar()" style="${dayStyle}"><span style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;${isSelected ? 'border-radius:6px;background:var(--brand);color:white;font-weight:700' : ''}">${d}</span>${hasTasks ? '<div class="w-1 h-1 rounded-full" style="background:var(--fg-tertiary)"></div>' : '<div style="height:4px"></div>'}</div>`;
             }
         }
 
@@ -853,10 +1325,37 @@
         function renderTaskList() {
             const list = document.getElementById('taskList'), dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
             const dayTasks = tasks.filter(t => t.date === dateStr).sort((a,b) => a.time.localeCompare(b.time));
-            list.innerHTML = dayTasks.length === 0 ? '<div class="text-center py-20 text-slate-600 italic text-sm">No hay eventos para este día.</div>' : '';
+            if (dayTasks.length === 0) {
+                list.innerHTML = '<div class="flex flex-col items-center justify-center py-16 text-center"><div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background:var(--border-subtle)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--fg-tertiary)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z"></path></svg></div><p class="text-sm font-medium" style="color:var(--fg-tertiary)">Sin eventos este día</p><p class="text-xs mt-1" style="color:var(--fg-muted)">Presiona "Nuevo Pendiente" para crear uno</p></div>';
+                return;
+            }
+            list.innerHTML = '';
             dayTasks.forEach(task => {
-                const item = document.createElement('div'); item.className = 'glass-card p-5 rounded-2xl group relative hover:border-white/20 transition-all';
-                item.innerHTML = `<div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>${task.time}</span><div class="flex gap-2 opacity-0 group-hover:opacity-100 transition"><button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-red-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></button><button onclick="editTask('${task.id}')" class="text-slate-400 hover:text-indigo-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button></div></div><h4 class="font-bold text-slate-200 group-hover:text-white transition">${task.title}</h4><p class="text-xs text-slate-500 mt-2 line-clamp-2">${task.description || 'Sin descripción'}</p>`;
+                const item = document.createElement('div'); item.className = 'card p-5 group';
+                const initials = task.title.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+                item.innerHTML = `<div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center text-xs font-bold" style="background:var(--brand-subtle);color:var(--brand)">${initials}</div>
+                    <div class="flex-grow min-w-0">
+                        <div class="flex items-center justify-between gap-3">
+                            <h4 class="font-bold text-sm truncate">${task.title}</h4>
+                            <div class="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                                <button onclick="editTask('${task.id}')" class="w-7 h-7 flex items-center justify-center rounded-lg transition" style="color:var(--fg-tertiary)" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--fg-tertiary)'">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                </button>
+                                <button onclick="deleteTask('${task.id}')" class="w-7 h-7 flex items-center justify-center rounded-lg transition" style="color:var(--fg-tertiary)" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--fg-tertiary)'">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-2">
+                            <span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5" style="color:var(--accent)">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                ${task.time}
+                            </span>
+                            ${task.description ? `<span class="text-xs truncate" style="color:var(--fg-tertiary)">${task.description}</span>` : ''}
+                        </div>
+                    </div>
+                </div>`;
                 list.appendChild(item);
             });
         }
