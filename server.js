@@ -90,6 +90,15 @@ app.get('/1sdas.png', (req, res) => {
   res.sendFile(path.join(__dirname, '1sdas.png'));
 });
 
+// Ruta de Plantillas
+app.get('/formato.xlsx', (req, res) => {
+  res.sendFile(path.join(__dirname, 'formato.xlsx'));
+});
+
+app.get('/formato.pdf', (req, res) => {
+  res.sendFile(path.join(__dirname, 'formato.pdf'));
+});
+
 // Ruta de Login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
