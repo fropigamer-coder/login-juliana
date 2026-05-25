@@ -1553,13 +1553,13 @@
 
         function openQuoteModal() {
             document.getElementById('quoteModal').classList.add('show');
-            setTimeout(() => document.getElementById('quoteModalContent').classList.remove('scale-95', 'opacity-0'), 10);
+            setTimeout(() => document.getElementById('quoteModalContent').classList.add('open'), 10);
             document.getElementById('quoteItemsTableBody').innerHTML = '';
             addQuoteItem();
         }
 
         function closeQuoteModal() {
-            document.getElementById('quoteModalContent').classList.add('scale-95', 'opacity-0');
+            document.getElementById('quoteModalContent').classList.remove('open');
             setTimeout(() => {
                 document.getElementById('quoteModal').classList.remove('show');
                 document.getElementById('quoteForm').reset();
@@ -1782,7 +1782,7 @@
             editingTaskId = null;
             document.querySelector('#taskModal h3').textContent = 'Añadir Evento';
             document.getElementById('taskModal').classList.add('show');
-            setTimeout(() => document.getElementById('modalContent').classList.remove('scale-95', 'opacity-0'), 10);
+            setTimeout(() => document.getElementById('modalContent').classList.add('open'), 10);
             document.getElementById('taskDate').valueAsDate = selectedDate;
         }        function editTask(id) {
             const task = tasks.find(t => t.id === id); if(!task) return;
@@ -1791,9 +1791,9 @@
             document.getElementById('taskTitle').value = task.title; document.getElementById('taskDesc').value = task.description;
             document.getElementById('taskDate').value = task.date; document.getElementById('taskTime').value = task.time;
             document.getElementById('taskModal').classList.add('show');
-            setTimeout(() => document.getElementById('modalContent').classList.remove('scale-95', 'opacity-0'), 10);
+            setTimeout(() => document.getElementById('modalContent').classList.add('open'), 10);
         }
-        function closeModal() { document.getElementById('modalContent').classList.add('scale-95', 'opacity-0'); setTimeout(() => { document.getElementById('taskModal').classList.remove('show'); document.getElementById('taskForm').reset(); }, 200); }
+        function closeModal() { document.getElementById('modalContent').classList.remove('open'); setTimeout(() => { document.getElementById('taskModal').classList.remove('show'); document.getElementById('taskForm').reset(); }, 200); }
         document.getElementById('taskForm').onsubmit = async (e) => {
             e.preventDefault(); const data = { id: editingTaskId || Date.now().toString(), title: document.getElementById('taskTitle').value, description: document.getElementById('taskDesc').value, date: document.getElementById('taskDate').value, time: document.getElementById('taskTime').value, alerted: false };
             try { await fetch(`${API_URL}/tasks`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); await loadTasks(); renderCalendar(); renderTaskList(); if(currentView === 'dashboard') renderDashboard(); closeModal(); } catch (err) { alert('Error'); }
