@@ -182,6 +182,73 @@
             height: 22px;
         }
 
+        /* --- Sidebar Collapse Toggle --- */
+        .sidebar-collapse-btn {
+            position: absolute;
+            top: 20px;
+            right: -13px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid var(--border-default);
+            background: var(--surface-raised);
+            color: var(--fg-tertiary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 25;
+            transition: all 0.25s var(--ease-out);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .sidebar-collapse-btn:hover {
+            background: var(--surface-hover);
+            color: var(--brand);
+            border-color: var(--brand);
+            box-shadow: 0 4px 12px rgba(254,81,38,0.2);
+            transform: scale(1.05);
+        }
+        .sidebar-collapse-btn:active {
+            transform: scale(0.95);
+        }
+        .sidebar-collapse-btn svg {
+            width: 13px;
+            height: 13px;
+            transition: transform 0.35s var(--ease-out);
+        }
+        body.sidebar-collapsed .sidebar-collapse-btn svg {
+            transform: rotate(180deg);
+        }
+        body.sidebar-collapsed .sidebar-collapse-btn {
+            right: -13px;
+            border-color: var(--border-medium);
+            background: var(--surface-raised);
+        }
+        body.sidebar-collapsed .sidebar-collapse-btn:hover {
+            border-color: var(--brand);
+            background: var(--surface-hover);
+        }
+
+        /* --- Sidebar Collapsed State --- */
+        .sidebar-inner {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-height: 0;
+            opacity: 1;
+            transition: opacity 0.25s var(--ease-out);
+        }
+        body.sidebar-collapsed .sidebar {
+            width: 0 !important;
+            padding: 0 !important;
+            overflow: hidden;
+            border-right: none;
+        }
+        body.sidebar-collapsed .sidebar-inner {
+            opacity: 0;
+            pointer-events: none;
+        }
+
         .nav-btn {
             display: flex;
             align-items: center;
@@ -693,10 +760,25 @@
                 transform: translateX(-100%);
                 z-index: 20;
                 box-shadow: 4px 0 40px rgba(0,0,0,0.4);
+                width: var(--sidebar-width) !important;
+                padding: var(--space-xl) !important;
+                overflow: visible !important;
+                border-right: 1px solid var(--border-default) !important;
+            }
+            body.sidebar-collapsed .sidebar {
+                width: var(--sidebar-width) !important;
+                padding: var(--space-xl) !important;
+                overflow: visible !important;
+                border-right: 1px solid var(--border-default) !important;
             }
             .sidebar.open { transform: translateX(0); }
+            .sidebar.open .sidebar-inner {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
             .sidebar-overlay { display: block; }
             .hamburger { display: flex; }
+            .sidebar-collapse-btn { display: none; }
 
             .topbar { padding: 0 var(--space-lg); height: 60px; }
             .topbar h2 { font-size: 16px; }
@@ -738,7 +820,7 @@
             .bg-orb--2 { display: none; }
             .bg-grid { background-size: 40px 40px; }
 
-            #three-bg { left: 0 !important; width: 100% !important; }
+            #three-bg { left: 0; width: 100%; }
         }
 
         /* --- Small phones (< 380px) --- */
@@ -773,7 +855,7 @@
 
             #view-quotes { padding: var(--space-xl); }
 
-            #three-bg { left: 220px !important; width: calc(100% - 220px) !important; }
+            #three-bg { left: 220px; width: calc(100% - 220px); }
         }
 
         /* --- Laptops / Desktops (1024px - 1400px) default --- */
@@ -793,7 +875,7 @@
             .bg-orb--1 { width: 800px; height: 800px; }
             .bg-orb--2 { width: 600px; height: 600px; }
             .bg-grid { background-size: 80px 80px; }
-            #three-bg { left: 280px !important; width: calc(100% - 280px) !important; }
+            #three-bg { left: 280px; width: calc(100% - 280px); }
         }
 
         /* --- 4K / Large TV (> 2000px) --- */
@@ -811,7 +893,7 @@
             #view-quotes { padding: var(--space-4xl); }
             .bg-orb--1 { width: 1000px; height: 1000px; }
             .bg-orb--2 { width: 700px; height: 700px; }
-            #three-bg { left: 300px !important; width: calc(100% - 300px) !important; }
+            #three-bg { left: 300px; width: calc(100% - 300px); }
         }
 
         /* --- Landscape phones --- */
@@ -835,39 +917,44 @@
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar flex flex-col p-6 shrink-0">
-        <div class="flex items-center gap-3 mb-10 px-2">
-            <img src="1sdas.png" alt="Logo" class="w-8 h-8 object-contain">
-            <div>
-                <h1 class="font-bold text-lg leading-none tracking-tight">FJAT</h1>
-                <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">Mecanindustria</p>
+    <aside id="sidebar" class="sidebar flex flex-col shrink-0">
+        <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="Colapsar sidebar" id="sidebarCollapseBtn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <div class="sidebar-inner p-6">
+            <div class="flex items-center gap-3 mb-10 px-2">
+                <img src="1sdas.png" alt="Logo" class="w-8 h-8 object-contain">
+                <div>
+                    <h1 class="font-bold text-lg leading-none tracking-tight">FJAT</h1>
+                    <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">Mecanindustria</p>
+                </div>
             </div>
-        </div>
 
-        <nav class="space-y-2 flex-grow">
-            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                Dashboard
-            </button>
-            <button onclick="switchView('events')" id="nav-events" class="nav-btn active-nav">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z"></path></svg>
-                Eventos
-            </button>
-            <button onclick="switchView('quotes')" id="nav-quotes" class="nav-btn">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                Cotizaciones
-            </button>
-        </nav>
+            <nav class="space-y-2 flex-grow">
+                <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Dashboard
+                </button>
+                <button onclick="switchView('events')" id="nav-events" class="nav-btn active-nav">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z"></path></svg>
+                    Eventos
+                </button>
+                <button onclick="switchView('quotes')" id="nav-quotes" class="nav-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Cotizaciones
+                </button>
+            </nav>
 
-        <div class="user-card">
-            <div class="user-avatar">J</div>
-            <div class="user-info">
-                <p class="name">Juliana</p>
-                <p class="role">Administrador</p>
+            <div class="user-card">
+                <div class="user-avatar">J</div>
+                <div class="user-info">
+                    <p class="name">Juliana</p>
+                    <p class="role">Administrador</p>
+                </div>
+                <button onclick="logout()" class="btn-logout" title="Cerrar sesión">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </button>
             </div>
-            <button onclick="logout()" class="btn-logout" title="Cerrar sesión">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            </button>
         </div>
     </aside>
 
@@ -1424,6 +1511,34 @@
                 quotes = await response.json();
             } catch (err) { console.error('Error:', err); }
         }
+
+        let sidebarCollapsed = false;
+
+        function toggleSidebarCollapse() {
+            sidebarCollapsed = !sidebarCollapsed;
+            document.body.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+            updateThreeBgPosition();
+        }
+
+        function updateThreeBgPosition() {
+            const threeBg = document.getElementById('three-bg');
+            if (!threeBg) return;
+            const sidebarWidth = sidebarCollapsed ? 0 : 260;
+            const w = window.innerWidth;
+            let bw = sidebarWidth;
+            if (w < 640) bw = 0;
+            else if (w >= 640 && w < 1024) bw = sidebarCollapsed ? 0 : 220;
+            else if (w >= 1400 && w < 2000) bw = sidebarCollapsed ? 0 : 280;
+            else if (w >= 2000) bw = sidebarCollapsed ? 0 : 300;
+            threeBg.style.left = bw + 'px';
+            threeBg.style.width = 'calc(100% - ' + bw + 'px)';
+            // Trigger Three.js renderer resize
+            window.dispatchEvent(new Event('resize'));
+        }
+
+        window.addEventListener('resize', function() {
+            updateThreeBgPosition();
+        });
 
         function switchView(view) {
             currentView = view;
