@@ -17,20 +17,20 @@
     }
     </script>
     <style>
-        /* ============================================
-           FJAT MECANINDUSTRIA — Design System
-           Industrial control panel aesthetic
-           ============================================ */
+        /* ================================================================
+           FJAT MECANINDUSTRIA — Dashboard Design System v3
+           Industrial Control Panel · Responsive: phone → tablet → laptop → TV
+           ================================================================ */
 
-        /* --- Tokens --- */
         :root {
             --brand: #fe5126;
             --brand-hover: #e84720;
             --brand-subtle: rgba(254, 81, 38, 0.12);
-            --brand-glow: rgba(254, 81, 38, 0.25);
+            --brand-glow: rgba(254, 81, 38, 0.35);
+            --brand-glow-soft: rgba(254, 81, 38, 0.06);
 
             --accent: #4a6cf7;
-            --accent-subtle: rgba(74, 108, 247, 0.12);
+            --accent-subtle: rgba(74, 108, 247, 0.1);
 
             --surface-base: #1a1c26;
             --surface-raised: #232632;
@@ -46,11 +46,11 @@
             --border-default: rgba(255, 255, 255, 0.07);
             --border-medium: rgba(255, 255, 255, 0.12);
 
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 20px;
-            --radius-2xl: 24px;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --radius-2xl: 22px;
 
             --space-xs: 4px;
             --space-sm: 8px;
@@ -59,53 +59,129 @@
             --space-xl: 24px;
             --space-2xl: 32px;
             --space-3xl: 40px;
+            --space-4xl: 48px;
 
             --sidebar-width: 260px;
+            --sidebar-collapsed: 0px;
             --topbar-height: 72px;
 
             --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
             --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- Base --- */
+        * { box-sizing: border-box; }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--surface-base);
             color: var(--fg-primary);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            margin: 0;
         }
 
-        /* --- Scrollbar (fine-tuned industrial) --- */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--fg-tertiary); }
 
-        /* --- Surface Cards --- */
-        .card {
-            background: var(--surface-raised);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius-xl);
-            transition: border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+        /* ================================================================
+           DECORATIVE BACKGROUND
+           ================================================================ */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
         }
-        .card:hover {
-            border-color: var(--border-medium);
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
         }
-        .card-elevated {
-            background: var(--surface-overlay);
-            border: 1px solid var(--border-medium);
-            border-radius: var(--radius-xl);
+        .bg-orb--1 {
+            width: 600px; height: 600px;
+            top: -20%; right: -10%;
+            background: radial-gradient(circle, rgba(254,81,38,0.2), transparent 70%);
+            animation: orbFloat1 14s ease-in-out infinite;
+        }
+        .bg-orb--2 {
+            width: 450px; height: 450px;
+            bottom: -15%; left: -8%;
+            background: radial-gradient(circle, rgba(74,108,247,0.12), transparent 70%);
+            animation: orbFloat2 11s ease-in-out infinite;
+        }
+        @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0,0) scale(1); }
+            33% { transform: translate(-40px,50px) scale(1.06); }
+            66% { transform: translate(30px,-30px) scale(0.94); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0,0) scale(1); }
+            33% { transform: translate(50px,-40px) scale(1.08); }
+            66% { transform: translate(-30px,30px) scale(0.92); }
         }
 
-        /* --- Sidebar --- */
+        /* ================================================================
+           SIDEBAR
+           ================================================================ */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--surface-base);
             border-right: 1px solid var(--border-default);
             position: relative;
-            z-index: 2;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: transform 0.35s var(--ease-out), width 0.35s var(--ease-out);
         }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 15;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s var(--ease-out);
+        }
+        .sidebar-overlay.show {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .hamburger {
+            display: none;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: transparent;
+            color: var(--fg-secondary);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out);
+            margin-right: var(--space-sm);
+        }
+        .hamburger:hover {
+            background: var(--surface-hover);
+            color: var(--fg-primary);
+        }
+        .hamburger svg {
+            width: 22px;
+            height: 22px;
+        }
+
         .nav-btn {
             display: flex;
             align-items: center;
@@ -126,14 +202,12 @@
             color: var(--fg-primary);
             background: var(--surface-hover);
         }
-        .nav-btn.active {
+        .nav-btn.active-nav {
             color: var(--brand);
             background: var(--brand-subtle);
             font-weight: 600;
         }
-        .nav-btn.active svg {
-            color: var(--brand);
-        }
+        .nav-btn.active-nav svg { color: var(--brand); }
         .nav-btn svg {
             width: 18px;
             height: 18px;
@@ -141,81 +215,198 @@
             transition: color 0.2s var(--ease-out);
         }
 
-        /* --- Top Bar --- */
+        /* --- Sidebar User Card --- */
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-lg) var(--space-lg) 0;
+            margin-top: auto;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: var(--space-lg);
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .user-info { flex-grow: 1; min-width: 0; }
+        .user-info .name {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-info .role {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--fg-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-top: 2px;
+        }
+        .btn-logout {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: transparent;
+            color: var(--fg-muted);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out);
+            flex-shrink: 0;
+        }
+        .btn-logout:hover {
+            color: #ef4444;
+            background: rgba(239,68,68,0.1);
+        }
+        .btn-logout svg { width: 18px; height: 18px; }
+
+        /* ================================================================
+           TOPBAR
+           ================================================================ */
         .topbar {
             height: var(--topbar-height);
             border-bottom: 1px solid var(--border-default);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 var(--space-3xl);
+            padding: 0 var(--space-2xl);
             flex-shrink: 0;
+            background: rgba(26,28,38,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: relative;
+            z-index: 5;
+        }
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
         }
 
-        /* --- Buttons --- */
+        /* ================================================================
+           BUTTONS
+           ================================================================ */
         .btn-primary {
-            background: var(--brand);
+            background: linear-gradient(135deg, var(--brand), #e84720);
             color: white;
-            padding: 10px 22px;
+            padding: 10px 20px;
             border-radius: var(--radius-md);
             font-size: 13px;
             font-weight: 700;
             border: none;
             cursor: pointer;
-            transition: all 0.2s var(--ease-out);
+            transition: all 0.25s var(--ease-out);
             display: inline-flex;
             align-items: center;
             gap: var(--space-sm);
+            position: relative;
+            overflow: hidden;
         }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--brand-hover), #d43d18);
+            opacity: 0;
+            transition: opacity 0.25s var(--ease-out);
+        }
+        .btn-primary:hover::before { opacity: 1; }
         .btn-primary:hover {
-            background: var(--brand-hover);
             transform: translateY(-1px);
+            box-shadow: 0 8px 24px var(--brand-glow);
         }
-        .btn-primary:active {
-            transform: translateY(0);
-        }
+        .btn-primary:active { transform: translateY(0) scale(0.99); }
+        .btn-primary > * { position: relative; z-index: 1; }
+
         .btn-secondary {
             background: transparent;
             color: var(--fg-secondary);
-            padding: 10px 22px;
+            padding: 10px 20px;
             border-radius: var(--radius-md);
             font-size: 13px;
             font-weight: 600;
             border: 1px solid var(--border-medium);
             cursor: pointer;
             transition: all 0.2s var(--ease-out);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
         }
         .btn-secondary:hover {
             color: var(--fg-primary);
             border-color: var(--fg-tertiary);
             background: var(--surface-hover);
         }
+        .btn-secondary:active { transform: scale(0.98); }
 
-        /* --- Inputs --- */
+        /* ================================================================
+           CARDS
+           ================================================================ */
+        .card {
+            background: rgba(35,38,50,0.85);
+            backdrop-filter: blur(16px) saturate(1.2);
+            -webkit-backdrop-filter: blur(16px) saturate(1.2);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out);
+            position: relative;
+        }
+        .card:hover {
+            border-color: var(--border-medium);
+        }
+        .card-elevated {
+            background: var(--surface-overlay);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+        }
+
+        /* ================================================================
+           INPUTS
+           ================================================================ */
         .input {
             width: 100%;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.25);
             border: 1px solid var(--border-default);
             border-radius: var(--radius-md);
             padding: 10px 14px;
             color: var(--fg-primary);
             font-size: 14px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             outline: none;
-            transition: border-color 0.2s var(--ease-out);
+            transition: border-color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
         }
+        .input:hover { border-color: rgba(255,255,255,0.1); }
         .input:focus {
             border-color: var(--brand);
             box-shadow: 0 0 0 3px var(--brand-subtle);
         }
-        .input::placeholder {
-            color: var(--fg-muted);
-        }
-        textarea.input {
-            resize: vertical;
-            min-height: 80px;
-        }
+        .input::placeholder { color: var(--fg-muted); }
+        textarea.input { resize: vertical; min-height: 80px; }
 
-        /* --- Calendar --- */
+        /* ================================================================
+           CALENDAR
+           ================================================================ */
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -225,7 +416,7 @@
             background: var(--surface-raised);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-md);
-            min-height: 76px;
+            min-height: 72px;
             padding: var(--space-sm) var(--space-md);
             cursor: pointer;
             transition: all 0.2s var(--ease-out);
@@ -233,46 +424,33 @@
         .day-card:hover {
             border-color: var(--brand);
             background: var(--surface-overlay);
+            transform: translateY(-1px);
         }
         .day-card.selected {
             background: var(--brand);
             border-color: var(--brand);
             color: white;
         }
-        .day-card.selected .task-indicator {
-            background: white;
-            opacity: 0.8;
-        }
+        .day-card.selected .task-indicator { background: white; opacity: 0.8; }
         .day-card.today {
             border-color: var(--brand);
             border-width: 1.5px;
         }
-        .day-card.today:not(.selected) {
-            background: rgba(254, 81, 38, 0.06);
-        }
-        .day-card.other-month {
-            opacity: 0.12;
-            pointer-events: none;
-        }
-        .day-card .day-number {
-            font-size: 13px;
-            font-weight: 600;
-        }
+        .day-card.today:not(.selected) { background: rgba(254,81,38,0.06); }
+        .day-card.other-month { opacity: 0.12; pointer-events: none; }
         .task-indicator {
-            width: 4px;
-            height: 4px;
+            width: 4px; height: 4px;
             border-radius: 50%;
             background: var(--brand);
             display: inline-block;
         }
 
-        /* --- Dropdowns --- */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
+        /* ================================================================
+           DROPDOWNS
+           ================================================================ */
+        .dropdown { position: relative; display: inline-block; }
         .dropdown-trigger {
-            background: var(--surface-raised);
+            background: rgba(0,0,0,0.2);
             border: 1px solid var(--border-default);
             border-radius: var(--radius-md);
             padding: 8px 14px;
@@ -283,7 +461,7 @@
             display: flex;
             align-items: center;
             gap: var(--space-sm);
-            transition: all 0.15s var(--ease-out);
+            transition: all 0.2s var(--ease-out);
         }
         .dropdown-trigger:hover {
             background: var(--surface-overlay);
@@ -302,10 +480,9 @@
             max-height: 280px;
             overflow-y: auto;
             padding: 4px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
         }
-        .dropdown-content.show {
-            display: block;
-        }
+        .dropdown-content.show { display: block; }
         .dropdown-item {
             padding: 8px 12px;
             color: var(--fg-secondary);
@@ -314,12 +491,11 @@
             transition: all 0.15s var(--ease-out);
             font-size: 13px;
         }
-        .dropdown-item:hover {
-            background: var(--surface-hover);
-            color: var(--fg-primary);
-        }
+        .dropdown-item:hover { background: var(--surface-hover); color: var(--fg-primary); }
 
-        /* --- Dashboard Metrics --- */
+        /* ================================================================
+           METRIC HERO
+           ================================================================ */
         .metric-hero {
             background: linear-gradient(135deg, var(--brand), #ff8c6b);
             border-radius: var(--radius-xl);
@@ -331,10 +507,8 @@
         .metric-hero::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -30%;
-            width: 200px;
-            height: 200px;
+            top: -50%; right: -30%;
+            width: 250px; height: 250px;
             border-radius: 50%;
             background: rgba(255,255,255,0.06);
             pointer-events: none;
@@ -342,21 +516,21 @@
         .metric-hero::after {
             content: '';
             position: absolute;
-            bottom: -20%;
-            right: 10%;
-            width: 120px;
-            height: 120px;
+            bottom: -30%; right: 5%;
+            width: 160px; height: 160px;
             border-radius: 50%;
             background: rgba(255,255,255,0.04);
             pointer-events: none;
         }
+
         .task-row {
-            padding: 14px var(--space-lg);
+            padding: 12px var(--space-lg);
             border-radius: var(--radius-md);
             transition: all 0.2s var(--ease-out);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: var(--space-md);
         }
         .task-row:hover {
             background: var(--surface-hover);
@@ -368,29 +542,30 @@
             border-radius: 100px;
             font-size: 10px;
             font-weight: 700;
-            letter-spacing: 0.01em;
+            white-space: nowrap;
         }
 
-        /* --- Quote Cards --- */
+        /* ================================================================
+           QUOTE CARDS
+           ================================================================ */
         .quote-card {
-            background: var(--surface-raised);
+            background: rgba(35,38,50,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-default);
             border-left: 3px solid var(--brand);
             border-radius: var(--radius-lg);
             padding: var(--space-xl);
-            transition: all 0.2s var(--ease-out);
+            transition: all 0.25s var(--ease-out);
         }
         .quote-card:hover {
             background: var(--surface-overlay);
             border-color: var(--border-medium);
             transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
 
-        /* --- Quote Table (modal) --- */
-        .quote-item-row td {
-            padding: 6px 10px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
+        .quote-item-row td { padding: 6px 10px; border-bottom: 1px solid var(--border-subtle); }
         .quote-item-row input {
             background: transparent;
             border: none;
@@ -399,53 +574,44 @@
             color: var(--fg-primary);
             font-size: 13px;
         }
-        .quote-item-row input:focus {
-            color: white;
-        }
+        .quote-item-row input:focus { color: white; }
 
-        /* --- Icon Buttons --- */
         .icon-btn {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
             border-radius: var(--radius-sm);
-            border: none;
-            cursor: pointer;
+            border: none; cursor: pointer;
             transition: all 0.2s var(--ease-out);
             color: var(--fg-tertiary);
         }
-        .icon-btn-excel { background: rgba(74, 108, 247, 0.08); }
-        .icon-btn-excel:hover { background: #4a6cf7; color: white; }
-        .icon-btn-pdf { background: rgba(254, 81, 38, 0.08); }
-        .icon-btn-pdf:hover { background: var(--brand); color: white; }
+        .icon-btn-excel { background: rgba(74,108,247,0.08); }
+        .icon-btn-excel:hover { background: #4a6cf7; color: white; transform: scale(1.05); }
+        .icon-btn-pdf { background: rgba(254,81,38,0.08); }
+        .icon-btn-pdf:hover { background: var(--brand); color: white; transform: scale(1.05); }
 
-        /* --- Tags --- */
         .tag {
-            font-size: 10px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: var(--radius-sm);
+            font-size: 10px; font-weight: 600;
+            padding: 2px 8px; border-radius: var(--radius-sm);
             color: var(--fg-tertiary);
             background: rgba(0,0,0,0.15);
         }
 
-        /* --- Modal --- */
+        /* ================================================================
+           MODALS
+           ================================================================ */
         .modal-backdrop {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.5);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             z-index: 100;
             display: none;
             align-items: center;
             justify-content: center;
+            padding: var(--space-lg);
         }
-        .modal-backdrop.show {
-            display: flex;
-        }
+        .modal-backdrop.show { display: flex; }
         .modal-content {
             background: var(--surface-raised);
             border: 1px solid var(--border-medium);
@@ -454,21 +620,28 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
             transform: scale(0.95);
             opacity: 0;
-            transition: all 0.25s var(--ease-out);
+            transition: all 0.3s var(--ease-out);
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        .modal-content.open {
-            transform: scale(1);
-            opacity: 1;
-        }
+        .modal-content.open { transform: scale(1); opacity: 1; }
 
-        /* --- Custom Alert (Toast) --- */
+        /* ================================================================
+           TOAST
+           ================================================================ */
+        #customAlert {
+            transition: transform 0.5s var(--ease-out), opacity 0.5s var(--ease-out);
+        }
         #customAlert.show {
-            transform: translateY(0);
-            opacity: 1;
+            transform: translateY(0) !important;
+            opacity: 1 !important;
             pointer-events: auto;
         }
 
-        /* --- Table (admin style) --- */
+        /* ================================================================
+           TABLE HEADER
+           ================================================================ */
         .table-header {
             font-size: 10px;
             font-weight: 700;
@@ -477,23 +650,8 @@
             color: var(--fg-tertiary);
             background: rgba(0,0,0,0.15);
         }
-        .table-header th {
-            padding: 10px 12px;
-        }
+        .table-header th { padding: 10px 12px; }
 
-        /* --- Icon container --- */
-        .icon-box {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-
-        /* --- Utility --- */
         .text-label {
             font-size: 10px;
             font-weight: 700;
@@ -505,12 +663,179 @@
             height: 1px;
             background: var(--border-default);
         }
+
+        /* ================================================================
+           ENTRANCE ANIMATIONS
+           ================================================================ */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .view-enter {
+            animation: fadeSlideUp 0.4s var(--ease-out) forwards;
+        }
+        .stagger-1 { animation-delay: 0.05s; }
+        .stagger-2 { animation-delay: 0.1s; }
+        .stagger-3 { animation-delay: 0.15s; }
+        .stagger-4 { animation-delay: 0.2s; }
+
+        /* ================================================================
+           RESPONSIVE BREAKPOINTS
+           ================================================================ */
+
+        /* --- Phones (< 640px) --- */
+        @media (max-width: 639px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                z-index: 20;
+                box-shadow: 4px 0 40px rgba(0,0,0,0.4);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay { display: block; }
+            .hamburger { display: flex; }
+
+            .topbar { padding: 0 var(--space-lg); height: 60px; }
+            .topbar h2 { font-size: 16px; }
+
+            #view-events {
+                flex-direction: column;
+                padding: var(--space-lg);
+                gap: var(--space-lg);
+            }
+            .day-card { min-height: 56px; padding: 6px 8px; }
+            .day-card .font-bold.text-sm { font-size: 12px; }
+            #view-events > div:last-child { width: 100% !important; }
+
+            #view-dashboard {
+                padding: var(--space-lg);
+            }
+            #view-dashboard .grid-cols-12 {
+                grid-template-columns: 1fr !important;
+                gap: var(--space-lg);
+            }
+            #view-dashboard .col-span-8,
+            #view-dashboard .col-span-4 {
+                grid-column: span 1 !important;
+            }
+            .metric-hero { padding: var(--space-xl); }
+            .metric-hero h3 { font-size: 22px !important; }
+            .card.p-8 { padding: var(--space-xl) !important; }
+            .card.p-8.h-\[500px\] { height: auto !important; max-height: 400px; }
+
+            #view-quotes { padding: var(--space-lg); }
+            #view-quotes .card.p-8 { padding: var(--space-lg) !important; }
+
+            .modal-content { padding: var(--space-xl); border-radius: var(--radius-xl); }
+            .modal-content.w-\[440px\] { max-width: 100%; }
+            .modal-content.w-\[90\%\] { width: 100% !important; }
+
+            .quote-card { padding: var(--space-lg); }
+            .bg-orb--1 { width: 300px; height: 300px; }
+            .bg-orb--2 { display: none; }
+            .bg-grid { background-size: 40px 40px; }
+
+            #three-bg { left: 0 !important; width: 100% !important; }
+        }
+
+        /* --- Small phones (< 380px) --- */
+        @media (max-width: 379px) {
+            .topbar h2 { font-size: 14px; }
+            .btn-primary { padding: 8px 14px; font-size: 12px; }
+            .btn-primary span { display: none; }
+            .calendar-grid { gap: 3px; }
+        }
+
+        /* --- Tablets (640px - 1024px) --- */
+        @media (min-width: 640px) and (max-width: 1024px) {
+            .sidebar { width: 220px; }
+            .sidebar .nav-btn { padding: 8px var(--space-md); font-size: 13px; }
+
+            .topbar { padding: 0 var(--space-xl); }
+
+            #view-events { padding: var(--space-xl); gap: var(--space-xl); }
+            #view-events > div:last-child { width: 300px !important; }
+            .day-card { min-height: 64px; }
+
+            #view-dashboard { padding: var(--space-xl); }
+            #view-dashboard .grid-cols-12 {
+                grid-template-columns: 1fr !important;
+                gap: var(--space-xl);
+            }
+            #view-dashboard .col-span-8,
+            #view-dashboard .col-span-4 {
+                grid-column: span 1 !important;
+            }
+            .metric-hero h3 { font-size: 26px !important; }
+
+            #view-quotes { padding: var(--space-xl); }
+
+            #three-bg { left: 220px !important; width: calc(100% - 220px) !important; }
+        }
+
+        /* --- Laptops / Desktops (1024px - 1400px) default --- */
+
+        /* --- TV / Ultrawide (> 1400px) --- */
+        @media (min-width: 1400px) {
+            .sidebar { width: 280px; }
+            .sidebar .nav-btn { padding: 12px var(--space-xl); font-size: 15px; }
+            .topbar { padding: 0 var(--space-3xl); }
+            #view-events { padding: var(--space-3xl); gap: var(--space-3xl); }
+            #view-events > div:last-child { width: 420px !important; }
+            .day-card { min-height: 88px; padding: var(--space-md); }
+            #view-dashboard { padding: var(--space-3xl); }
+            #view-dashboard .grid-cols-12 { gap: var(--space-3xl); }
+            .metric-hero h3 { font-size: 32px !important; }
+            #view-quotes { padding: var(--space-3xl); }
+            .bg-orb--1 { width: 800px; height: 800px; }
+            .bg-orb--2 { width: 600px; height: 600px; }
+            .bg-grid { background-size: 80px 80px; }
+            #three-bg { left: 280px !important; width: calc(100% - 280px) !important; }
+        }
+
+        /* --- 4K / Large TV (> 2000px) --- */
+        @media (min-width: 2000px) {
+            .sidebar { width: 300px; }
+            .topbar { height: 80px; padding: 0 var(--space-4xl); }
+            .topbar h2 { font-size: 26px; }
+            .btn-primary { padding: 14px 28px; font-size: 15px; }
+            #view-events { padding: var(--space-4xl); gap: var(--space-4xl); }
+            #view-events > div:last-child { width: 480px !important; }
+            .day-card { min-height: 100px; padding: var(--space-lg); }
+            #view-dashboard { padding: var(--space-4xl); }
+            #view-dashboard .grid-cols-12 { gap: var(--space-4xl); }
+            .metric-hero h3 { font-size: 36px !important; }
+            #view-quotes { padding: var(--space-4xl); }
+            .bg-orb--1 { width: 1000px; height: 1000px; }
+            .bg-orb--2 { width: 700px; height: 700px; }
+            #three-bg { left: 300px !important; width: calc(100% - 300px) !important; }
+        }
+
+        /* --- Landscape phones --- */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sidebar { padding-top: var(--space-md) !important; padding-bottom: var(--space-md) !important; }
+            .topbar { height: 52px; }
+            .sidebar .user-card { display: none; }
+            .day-card { min-height: 44px; padding: 4px 6px; }
+            .bg-orb--1, .bg-orb--2 { opacity: 0.15; }
+        }
     </style>
 </head>
 <body class="flex min-h-screen overflow-hidden" onclick="closeAllDropdowns()">
 
+    <!-- Decorative Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-orb bg-orb--1"></div>
+    <div class="bg-orb bg-orb--2"></div>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar -->
-    <aside class="sidebar flex flex-col p-6 shrink-0">
+    <aside id="sidebar" class="sidebar flex flex-col p-6 shrink-0">
         <div class="flex items-center gap-3 mb-10 px-2">
             <img src="1sdas.png" alt="Logo" class="w-8 h-8 object-contain">
             <div>
@@ -524,7 +849,7 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Dashboard
             </button>
-            <button onclick="switchView('events')" id="nav-events" class="nav-btn active">
+            <button onclick="switchView('events')" id="nav-events" class="nav-btn active-nav">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z"></path></svg>
                 Eventos
             </button>
@@ -534,17 +859,15 @@
             </button>
         </nav>
 
-        <div class="mt-auto pt-6 border-t border-white/5 px-2">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-[#fe5126] flex items-center justify-center font-bold">J</div>
-                <div class="flex-grow">
-                    <p class="text-sm font-bold">Juliana</p>
-                    <p class="text-[10px] text-slate-500">Administrador</p>
-                </div>
-                <button onclick="logout()" class="text-slate-500 hover:text-red-400 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                </button>
+        <div class="user-card">
+            <div class="user-avatar">J</div>
+            <div class="user-info">
+                <p class="name">Juliana</p>
+                <p class="role">Administrador</p>
             </div>
+            <button onclick="logout()" class="btn-logout" title="Cerrar sesión">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            </button>
         </div>
     </aside>
 
@@ -552,11 +875,18 @@
     <main class="flex-grow flex flex-col h-screen overflow-hidden" style="position: relative; z-index: 1;">
         <!-- Top Bar -->
         <header class="topbar">
-            <h2 id="view-title" class="text-xl font-bold tracking-tight">Eventos</h2>
-            <button onclick="openModal()" class="btn-primary">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Nuevo Pendiente
-            </button>
+            <div class="topbar-left">
+                <button id="hamburgerBtn" class="hamburger" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <h2 id="view-title" class="text-xl font-bold tracking-tight">Eventos</h2>
+            </div>
+            <div class="topbar-right">
+                <button onclick="openModal()" class="btn-primary">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span>Nuevo Pendiente</span>
+                </button>
+            </div>
         </header>
 
         <!-- View: EVENTS -->
@@ -830,7 +1160,7 @@
     </div>
 
     <!-- Three.js Background Canvas -->
-    <div id="three-bg" class="fixed inset-0 z-0 pointer-events-none" style="position: fixed; top: 0; left: 260px; width: calc(100% - 260px); height: 100%; z-index: 0;"></div>
+    <div id="three-bg" class="fixed inset-0 z-0 pointer-events-none" style="position: fixed; top: 0; left: var(--sidebar-width, 260px); width: calc(100% - var(--sidebar-width, 260px)); height: 100%; z-index: 0;"></div>
 
     <!-- Custom Alert (Toast) -->
     <div id="customAlert" class="fixed bottom-10 right-10 z-[200] transform translate-y-20 opacity-0 pointer-events-none transition-all duration-500" style="transition-timing-function:var(--ease-out)">
@@ -857,48 +1187,102 @@
         const bgContainer = document.getElementById('three-bg');
         if (!bgContainer) return;
 
+        // Helper to get container dimensions (handles responsive resizes)
+        function getContainerSize() {
+            // The container uses CSS var(--sidebar-width) which might not be accessible from JS
+            // Use getBoundingClientRect instead
+            const rect = bgContainer.getBoundingClientRect();
+            return { w: rect.width || window.innerWidth, h: rect.height || window.innerHeight };
+        }
+
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1a1c26);
 
-        const camera = new THREE.PerspectiveCamera(60, bgContainer.clientWidth / bgContainer.clientHeight, 0.1, 1000);
-        camera.position.z = 20;
+        let { w, h } = getContainerSize();
+        const camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 1000);
+        camera.position.z = 22;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-        renderer.setSize(bgContainer.clientWidth, bgContainer.clientHeight);
+        renderer.setSize(w, h);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.2;
         bgContainer.appendChild(renderer.domElement);
 
-        // --- PARTICLES (600 points with gradient colors) ---
+        // --- PARTICLES (600 points with spherical distribution) ---
         const particleCount = 600;
         const positions = new Float32Array(particleCount * 3);
         const colors = new Float32Array(particleCount * 3);
+        const sizes = new Float32Array(particleCount);
         const primaryColor = new THREE.Color(0xfe5126);
         const accentColor = new THREE.Color(0x4a6cf7);
 
         for (let i = 0; i < particleCount; i++) {
-            positions[i*3] = (Math.random() - 0.5) * 60;
-            positions[i*3+1] = (Math.random() - 0.5) * 40;
-            positions[i*3+2] = (Math.random() - 0.5) * 30;
+            const radius = 15 + Math.random() * 20;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            positions[i*3] = Math.sin(phi) * Math.cos(theta) * radius;
+            positions[i*3+1] = Math.sin(phi) * Math.sin(theta) * radius * 0.6;
+            positions[i*3+2] = Math.cos(phi) * radius;
             const color = primaryColor.clone().lerp(accentColor, Math.random());
             colors[i*3] = color.r; colors[i*3+1] = color.g; colors[i*3+2] = color.b;
+            sizes[i] = 0.08 + Math.random() * 0.15;
         }
 
         const particleGeo = new THREE.BufferGeometry();
         particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particleGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
-        const particles = new THREE.Points(
-            particleGeo,
-            new THREE.PointsMaterial({
-                size: 0.15, vertexColors: true, transparent: true,
-                opacity: 0.7, blending: THREE.AdditiveBlending, sizeAttenuation: true
-            })
-        );
+        const particleMat = new THREE.PointsMaterial({
+            size: 0.15, vertexColors: true, transparent: true,
+            opacity: 0.6, blending: THREE.AdditiveBlending, sizeAttenuation: true
+        });
+        const particles = new THREE.Points(particleGeo, particleMat);
         scene.add(particles);
 
-        // --- GEOMETRIC SHAPES (12 floating objects) ---
+        // --- GLOW ORB SPRITES ---
+        function createGlowTexture(color, size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(0.2, color.replace('1)', '0.4)'));
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const glowOrbs = [];
+        const orbColors = ['rgba(254,81,38,1)', 'rgba(74,108,247,1)', 'rgba(255,140,107,1)'];
+        for (let i = 0; i < 4; i++) {
+            const spriteMat = new THREE.SpriteMaterial({
+                map: createGlowTexture(orbColors[i % orbColors.length], 128),
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                opacity: 0.3 + Math.random() * 0.1,
+                depthWrite: false
+            });
+            const sprite = new THREE.Sprite(spriteMat);
+            sprite.scale.set(8 + Math.random() * 6, 8 + Math.random() * 6, 1);
+            sprite.position.set(
+                (Math.random() - 0.5) * 30,
+                (Math.random() - 0.5) * 20,
+                -10 - Math.random() * 10
+            );
+            sprite.userData = {
+                floatSpeed: 0.15 + Math.random() * 0.15,
+                floatAmount: 0.5 + Math.random() * 1,
+                basePos: sprite.position.clone(),
+                pulseSpeed: 0.3 + Math.random() * 0.2
+            };
+            scene.add(sprite);
+            glowOrbs.push(sprite);
+        }
+
+        // --- GEOMETRIC SHAPES ---
         const shapes = [];
         const shapeColors = [0xfe5126, 0x4a6cf7, 0xff8c6b, 0x6c5ce7, 0xf97316];
         const geometries = [
@@ -913,34 +1297,50 @@
             const mesh = new THREE.Mesh(geometries[i % geometries.length], new THREE.MeshPhysicalMaterial({
                 color: shapeColors[i % shapeColors.length],
                 metalness: 0.3, roughness: 0.4, transparent: true,
-                opacity: 0.15 + Math.random() * 0.15,
+                opacity: 0.12 + Math.random() * 0.12,
                 wireframe: Math.random() > 0.5
             }));
-            mesh.position.set((Math.random() - 0.5) * 40, (Math.random() - 0.5) * 25, (Math.random() - 0.5) * 20 - 5);
+            mesh.position.set(
+                (Math.random() - 0.5) * 40,
+                (Math.random() - 0.5) * 25,
+                (Math.random() - 0.5) * 20 - 5
+            );
             mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
             mesh.userData = {
-                rotSpeed: (Math.random() - 0.5) * 0.01,
+                rotSpeed: (Math.random() - 0.5) * 0.008,
                 floatSpeed: 0.2 + Math.random() * 0.3,
-                floatAmount: 0.2 + Math.random() * 0.5,
-                baseY: mesh.position.y
+                floatAmount: 0.2 + Math.random() * 0.4,
+                baseY: mesh.position.y,
+                orbitRadius: 0.2 + Math.random() * 0.3,
+                orbitSpeed: 0.05 + Math.random() * 0.05
             };
             scene.add(mesh);
             shapes.push(mesh);
         }
 
-        // --- MOUSE PARALLAX ---
+        // --- MOUSE & TOUCH PARALLAX ---
         const mouse = { x: 0, y: 0 }, target = { x: 0, y: 0 };
-        document.addEventListener('mousemove', (e) => {
+        
+        function updateMouse(clientX, clientY) {
             const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-        });
+            mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+        }
+
+        document.addEventListener('mousemove', (e) => updateMouse(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
 
         window.addEventListener('resize', () => {
-            const w = bgContainer.clientWidth, h = bgContainer.clientHeight;
-            camera.aspect = w / h;
+            const rect = bgContainer.getBoundingClientRect();
+            const newW = rect.width || window.innerWidth;
+            const newH = rect.height || window.innerHeight;
+            camera.aspect = newW / newH;
             camera.updateProjectionMatrix();
-            renderer.setSize(w, h);
+            renderer.setSize(newW, newH);
         });
 
         // --- ANIMATION LOOP ---
@@ -948,20 +1348,36 @@
             requestAnimationFrame(animate);
             const t = performance.now() / 1000;
 
+            // Smooth mouse follow
             target.x += (mouse.x - target.x) * 0.02;
             target.y += (mouse.y - target.y) * 0.02;
 
+            // Camera gentle parallax
             camera.position.x += (target.x * 1.5 - camera.position.x) * 0.01;
             camera.position.y += (target.y * 1 - camera.position.y) * 0.01;
             camera.lookAt(0, 0, 0);
 
-            particles.rotation.y = t * 0.03;
-            particles.rotation.x = Math.sin(t * 0.01) * 0.05;
+            // Particles slow rotation
+            particles.rotation.y = t * 0.025;
+            particles.rotation.x = Math.sin(t * 0.008) * 0.04;
+            particleMat.size = 0.15 + Math.sin(t * 0.5) * 0.02;
 
+            // Glow orbs float animation
+            glowOrbs.forEach((orb, i) => {
+                const ud = orb.userData;
+                orb.position.x = ud.basePos.x + Math.sin(t * ud.floatSpeed + i * 2) * ud.floatAmount;
+                orb.position.y = ud.basePos.y + Math.cos(t * ud.floatSpeed * 0.7 + i) * ud.floatAmount * 0.7;
+                orb.material.opacity = 0.25 + Math.sin(t * ud.pulseSpeed + i) * 0.1;
+            });
+
+            // Shapes float + orbit
             shapes.forEach((mesh, i) => {
-                mesh.rotation.x += mesh.userData.rotSpeed * 1.5;
-                mesh.rotation.y += mesh.userData.rotSpeed;
-                mesh.position.y = mesh.userData.baseY + Math.sin(t * mesh.userData.floatSpeed + i) * mesh.userData.floatAmount;
+                const ud = mesh.userData;
+                mesh.rotation.x += ud.rotSpeed * 1.5;
+                mesh.rotation.y += ud.rotSpeed;
+                mesh.position.y = ud.baseY + Math.sin(t * ud.floatSpeed + i * 1.5) * ud.floatAmount;
+                // Subtle orbit around center
+                mesh.position.x += Math.sin(t * ud.orbitSpeed + i) * ud.orbitRadius * 0.005;
             });
 
             renderer.render(scene, camera);
@@ -1376,7 +1792,51 @@
         function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
         function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
         function logout() { window.location.href = 'index.html'; }
+
+        // --- SIDEBAR TOGGLE ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        // --- VIEW ENTRANCE ANIMATIONS ---
+        function animateViewIn(viewId) {
+            const el = document.getElementById(viewId);
+            if (!el) return;
+            el.classList.remove('view-enter', 'stagger-1', 'stagger-2', 'stagger-3');
+            // Force reflow
+            void el.offsetWidth;
+            el.classList.add('view-enter');
+            // Add stagger to children
+            const children = el.querySelectorAll('.card, .quote-card, .metric-hero, .btn-primary');
+            children.forEach((child, i) => {
+                child.classList.remove('stagger-' + (i + 1));
+                void child.offsetWidth;
+                child.classList.add('stagger-' + Math.min(i + 1, 4));
+            });
+        }
+
+        // Patch switchView to animate when switching to dashboard or quotes
+        const origSwitchView = switchView;
+        switchView = function(view) {
+            origSwitchView(view);
+            setTimeout(() => {
+                if (view === 'dashboard') animateViewIn('view-dashboard');
+                else if (view === 'quotes') animateViewIn('view-quotes');
+                else if (view === 'events') animateViewIn('view-events');
+            }, 50);
+            // Close sidebar on mobile after selecting a view
+            if (window.innerWidth < 640) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('show');
+            }
+        };
+
         init();
+        // Trigger initial entrance animation
+        setTimeout(() => animateViewIn('view-events'), 100);
     </script>
 </body>
 </html>
