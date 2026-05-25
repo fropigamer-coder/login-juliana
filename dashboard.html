@@ -1562,11 +1562,33 @@
             } catch (err) { alert('Error al generar PDF'); }
         }
 
-        function openQuoteModal() {
+        function openQuoteModal(quoteData) {
+            editingQuoteId = quoteData && quoteData.id ? quoteData.id : null;
+            document.querySelector('#quoteModal h3').textContent = editingQuoteId ? 'Editar Cotización' : 'Nueva Cotización';
+            document.getElementById('quoteForm').reset();
+            document.getElementById('quoteItemsTableBody').innerHTML = '';
+
+            if (quoteData) {
+                document.querySelector('[name="company"]').value = quoteData.company || '';
+                document.querySelector('[name="ruc"]').value = quoteData.ruc || '';
+                document.querySelector('[name="client_name"]').value = quoteData.client_name || '';
+                document.querySelector('[name="address"]').value = quoteData.address || '';
+                document.querySelector('[name="quote_date"]').value = quoteData.quote_date ? quoteData.quote_date.split('T')[0] : '';
+                document.querySelector('[name="offer_validity"]').value = quoteData.offer_validity || '';
+                document.querySelector('[name="valid_until"]').value = quoteData.valid_until ? quoteData.valid_until.split('T')[0] : '';
+                document.querySelector('[name="activities"]').value = quoteData.activities || '';
+                document.querySelector('[name="task_description"]').value = quoteData.task_description || '';
+                document.querySelector('[name="location"]').value = quoteData.location || '';
+                document.querySelector('[name="equipment"]').value = quoteData.equipment || '';
+                const existingItems = typeof quoteData.items === 'string' ? JSON.parse(quoteData.items) : (quoteData.items || []);
+                existingItems.forEach(item => addQuoteItem(item));
+                updateQuoteTotal();
+            } else {
+                addQuoteItem();
+            }
+
             document.getElementById('quoteModal').classList.add('show');
             setTimeout(() => document.getElementById('quoteModalContent').classList.add('open'), 10);
-            document.getElementById('quoteItemsTableBody').innerHTML = '';
-            addQuoteItem();
         }
 
         function closeQuoteModal() {
@@ -1574,21 +1596,22 @@
             setTimeout(() => {
                 document.getElementById('quoteModal').classList.remove('show');
                 document.getElementById('quoteForm').reset();
+                editingQuoteId = null;
             }, 200);
         }
 
-        function addQuoteItem() {
+        function addQuoteItem(itemData) {
             const tbody = document.getElementById('quoteItemsTableBody');
             const rowCount = tbody.rows.length + 1;
             const tr = document.createElement('tr');
             tr.className = 'quote-item-row';
             tr.innerHTML = `
                 <td><input type="text" value="${rowCount}" readonly class="text-center opacity-50"></td>
-                <td><input type="text" name="item_desc" placeholder="Descripción del servicio..." required></td>
-                <td><input type="text" name="item_und" placeholder="UND" required></td>
-                <td><input type="number" name="item_qty" value="1" min="1" oninput="calculateRow(this)" required></td>
-                <td><input type="number" name="item_price" value="0" min="0" step="0.01" oninput="calculateRow(this)" required></td>
-                <td><input type="number" name="item_partial" value="0" readonly class="font-bold text-[#fe5126]"></td>
+                <td><input type="text" name="item_desc" placeholder="Descripción del servicio..." required ${itemData ? `value="${itemData.description}"` : ''}></td>
+                <td><input type="text" name="item_und" placeholder="UND" required ${itemData ? `value="${itemData.und}"` : ''}></td>
+                <td><input type="number" name="item_qty" min="1" oninput="calculateRow(this)" required ${itemData ? `value="${itemData.qty}"` : 'value="1"'}></td>
+                <td><input type="number" name="item_price" min="0" step="0.01" oninput="calculateRow(this)" required ${itemData ? `value="${itemData.price}"` : 'value="0"'}></td>
+                <td><input type="number" name="item_partial" readonly class="font-bold text-[#fe5126]" ${itemData ? `value="${itemData.partial}"` : 'value="0"'}></td>
                 <td><button type="button" onclick="this.closest('tr').remove(); updateQuoteTotal();" class="text-slate-600 hover:text-red-400">×</button></td>
             `;
             tbody.appendChild(tr);
@@ -1610,6 +1633,20 @@
             document.getElementById('quoteTotalDisplay').textContent = `S/ ${total.toFixed(2)}`;
         }
 
+        function editQuote(id) {
+            const quote = quotes.find(q => q.id.toString() === id.toString());
+            if (!quote) return;
+            openQuoteModal(quote);
+        }
+
+        async function deleteQuote(id) {
+            if (!confirm('¿Eliminar esta cotización permanentemente?')) return;
+            try {
+                const res = await fetch(`${API_URL}/quotes/${id}`, { method: 'DELETE' });
+                if (res.ok) { await loadQuotes(); renderQuotes(); }
+            } catch (err) { alert('Error al eliminar la cotización'); }
+        }
+
         document.getElementById('quoteForm').onsubmit = async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -1627,7 +1664,9 @@
             data.items = items;
             data.total_amount = document.getElementById('quoteTotalDisplay').textContent.replace('S/ ', '');
             try {
-                const res = await fetch(`${API_URL}/quotes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const method = editingQuoteId ? 'PUT' : 'POST';
+                const url = editingQuoteId ? `${API_URL}/quotes/${editingQuoteId}` : `${API_URL}/quotes`;
+                const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
                 if (res.ok) { await loadQuotes(); renderQuotes(); closeQuoteModal(); }
             } catch (err) { alert('Error al guardar'); }
         };
