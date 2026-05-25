@@ -1631,7 +1631,41 @@
             `;
         }
 
-        async function exportToExcel(quoteId) {
+        
+        // --- Mobile-friendly download helper ---
+        // Falls back through multiple strategies so downloads work on both desktop and mobile browsers
+        function downloadBlob(blob, filename) {
+            var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            var url = URL.createObjectURL(blob);
+
+            // On mobile, try the Web Share API first (best UX: lets user save to Files, Share, etc.)
+            if (isMobile && navigator.share) {
+                navigator.share({
+                    files: [new File([blob], filename, { type: blob.type })],
+                    title: filename
+                }).catch(function() {
+                    // Share dismissed or not supported — open in new tab as fallback
+                    window.open(url, '_blank');
+                }).finally(function() {
+                    setTimeout(function() { URL.revokeObjectURL(url); }, 10000);
+                });
+                return;
+            }
+
+            // Desktop (or mobile without Share API): use standard download attribute
+            var link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(function() {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, isMobile ? 3000 : 1000);
+        }
+
+async function exportToExcel(quoteId) {
             const quote = quotes.find(q => q.id.toString() === quoteId.toString());
             if (!quote) return;
             try {
@@ -1651,7 +1685,8 @@
                     updateCell('D' + row, item.qty); updateCell('E' + row, parseFloat(item.price).toFixed(2)); updateCell('F' + row, parseFloat(item.partial).toFixed(2));
                 });
                 updateCell('F' + (15 + items.length + 1), 'S/ ' + quote.total_amount);
-                XLSX.writeFile(workbook, `Presupuesto_${quote.company.replace(/\s+/g, '_')}.xlsx`);
+                var wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                downloadBlob(new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `Presupuesto_${quote.company.replace(/\s+/g, '_')}.xlsx`);
             } catch (err) { alert('No se pudo cargar la plantilla formato.xlsx'); }
         }
 
@@ -1677,7 +1712,7 @@
                 drawText('S/ ' + quote.total_amount, 530, 750, 12);
                 const pdfBytes = await pdfDoc.save();
                 const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([pdfBytes], { type: 'application/pdf' }));
-                link.download = `Presupuesto_${quote.company.replace(/\s+/g, '_')}.pdf`; link.click();
+                downloadBlob(new Blob([pdfBytes], { type: 'application/pdf' }), `Presupuesto_${quote.company.replace(/\s+/g, '_')}.pdf`);
             } catch (err) { alert('Error al generar PDF'); }
         }
 
