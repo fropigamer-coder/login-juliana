@@ -3,7 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FJAT Events | Dashboard</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="FJAT Mecanindustria SAC - Dashboard de gestión industrial. Administración de eventos, tareas, calendario y cotizaciones para servicios de mantenimiento y fabricación industrial en Perú.">
+    <meta name="keywords" content="FJAT, Mecanindustria, SAC, dashboard industrial, gestión de eventos, cotizaciones, mantenimiento industrial, fabricación, mecanizado, Perú">
+    <meta name="author" content="FJAT Mecanindustria SAC">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#fe5126">
+    <link rel="icon" href="1sdas.png" type="image/png">
+    <link rel="apple-touch-icon" href="1sdas.png">
+    <meta property="og:title" content="FJAT Mecanindustria SAC - Dashboard">
+    <meta property="og:description" content="Panel de control para gestión de eventos, tareas y cotizaciones industriales.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="FJAT Mecanindustria SAC">
+    <meta property="og:locale" content="es_PE">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="FJAT Mecanindustria SAC - Dashboard">
+    <meta name="twitter:description" content="Panel de control para gestión de eventos, tareas y cotizaciones industriales.">
+    <link rel="canonical" href="/dashboard.html">
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//unpkg.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
+    <title>FJAT Mecanindustria SAC — Dashboard de Gestión Industrial | Panel de Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -921,6 +948,39 @@
             .bg-orb--1, .bg-orb--2 { opacity: 0.15; }
         }
     </style>
+
+    <!-- Structured Data JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "FJAT Mecanindustria SAC",
+        "description": "Empresa peruana especializada en mantenimiento industrial, fabricación y servicios de mecanizado.",
+        "url": "https://fjatmecanindustria.com",
+        "logo": "/1sdas.png",
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "PE"
+        },
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "availableLanguage": ["Spanish"]
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "FJAT Mecanindustria Dashboard",
+        "description": "Panel de control interno para gestión de eventos, tareas y cotizaciones industriales.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "browserRequirements": "Requires JavaScript"
+    }
+    </script>
+
 </head>
 <body class="flex min-h-screen overflow-hidden" onclick="closeAllDropdowns()">
 
@@ -940,7 +1000,7 @@
     <aside id="sidebar" class="sidebar flex flex-col shrink-0">
         <div class="sidebar-inner p-6">
             <div class="flex items-center gap-3 mb-10 px-2">
-                <img src="1sdas.png" alt="Logo" class="w-8 h-8 object-contain">
+                <img src="1sdas.png" alt="FJAT Mecanindustria SAC - Logo oficial" class="w-8 h-8 object-contain">
                 <div>
                     <h1 class="font-bold text-lg leading-none tracking-tight">FJAT</h1>
                     <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">Mecanindustria</p>
