@@ -15,19 +15,20 @@
     }
     </script>
     <style>
-        /* ============================================
-           FJAT MECANINDUSTRIA — Login Design System
-           Industrial dark theme, consistent with dashboard
-           ============================================ */
+        /* ================================================================
+           FJAT MECANINDUSTRIA — Login Design System v3
+           Industrial Control Panel · Responsive: phone → tablet → laptop → TV
+           ================================================================ */
 
         :root {
             --brand: #fe5126;
             --brand-hover: #e84720;
             --brand-subtle: rgba(254, 81, 38, 0.12);
-            --brand-glow: rgba(254, 81, 38, 0.25);
+            --brand-glow: rgba(254, 81, 38, 0.35);
+            --brand-glow-soft: rgba(254, 81, 38, 0.06);
 
             --accent: #4a6cf7;
-            --accent-subtle: rgba(74, 108, 247, 0.12);
+            --accent-subtle: rgba(74, 108, 247, 0.1);
 
             --surface-base: #1a1c26;
             --surface-raised: #232632;
@@ -43,11 +44,11 @@
             --border-default: rgba(255, 255, 255, 0.07);
             --border-medium: rgba(255, 255, 255, 0.12);
 
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 20px;
-            --radius-2xl: 24px;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --radius-2xl: 22px;
 
             --space-xs: 4px;
             --space-sm: 8px;
@@ -73,14 +74,82 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
-        /* --- Scrollbar --- */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 4px; }
 
-        /* --- Login Card --- */
+        /* ================================================================
+           DECORATIVE BACKGROUND ELEMENTS
+           ================================================================ */
+
+        /* --- Industrial Grid Overlay --- */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        /* --- Glow Orbs --- */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.5;
+        }
+        .bg-orb--1 {
+            width: 500px;
+            height: 500px;
+            top: -15%;
+            right: -10%;
+            background: radial-gradient(circle, rgba(254,81,38,0.25), transparent 70%);
+            animation: orbFloat1 12s ease-in-out infinite;
+        }
+        .bg-orb--2 {
+            width: 400px;
+            height: 400px;
+            bottom: -10%;
+            left: -10%;
+            background: radial-gradient(circle, rgba(74,108,247,0.15), transparent 70%);
+            animation: orbFloat2 10s ease-in-out infinite;
+        }
+        .bg-orb--3 {
+            width: 250px;
+            height: 250px;
+            top: 40%;
+            left: 60%;
+            background: radial-gradient(circle, rgba(254,81,38,0.1), transparent 70%);
+            animation: orbFloat3 8s ease-in-out infinite;
+        }
+
+        @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-30px, 40px) scale(1.05); }
+            66% { transform: translate(20px, -20px) scale(0.95); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(40px, -30px) scale(1.08); }
+            66% { transform: translate(-20px, 20px) scale(0.92); }
+        }
+        @keyframes orbFloat3 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-20px, 30px) scale(1.1); }
+        }
+
+        /* ================================================================
+           LOGIN CARD — Glass-morphism industrial
+           ================================================================ */
+
         .login-container {
             position: relative;
             z-index: 10;
@@ -96,13 +165,55 @@
         }
 
         .login-card {
-            background: var(--surface-raised);
+            background: rgba(35, 38, 50, 0.85);
+            backdrop-filter: blur(24px) saturate(1.2);
+            -webkit-backdrop-filter: blur(24px) saturate(1.2);
             border: 1px solid var(--border-default);
             border-radius: var(--radius-2xl);
             padding: var(--space-3xl) var(--space-2xl);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.04);
+            position: relative;
+            overflow: hidden;
+        }
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(254,81,38,0.3), transparent);
+            pointer-events: none;
+        }
+        .login-card::after {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(254,81,38,0.06), transparent 70%);
+            pointer-events: none;
+        }
+
+        /* --- Card status badge --- */
+        .card-badge {
+            position: absolute;
+            top: var(--space-lg);
+            right: var(--space-lg);
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--fg-muted);
+            padding: 3px 10px;
+            border-radius: 100px;
+            border: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.15);
+            pointer-events: none;
         }
 
         /* --- Logo --- */
@@ -116,17 +227,22 @@
             width: 44px;
             height: 44px;
             object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(254,81,38,0.15));
         }
         .logo-divider {
             width: 1px;
             height: 36px;
-            background: var(--border-medium);
+            background: linear-gradient(to bottom, transparent, var(--border-medium), transparent);
         }
         .logo-text h1 {
             font-size: 22px;
             font-weight: 700;
             letter-spacing: -0.02em;
             line-height: 1.1;
+            background: linear-gradient(135deg, var(--fg-primary) 60%, var(--fg-tertiary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .logo-text p {
             font-size: 9px;
@@ -134,7 +250,8 @@
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--brand);
-            margin-top: 2px;
+            margin-top: 3px;
+            -webkit-text-fill-color: var(--brand);
         }
 
         /* --- Greeting --- */
@@ -157,10 +274,10 @@
         }
         .input-group label {
             display: block;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.08em;
             color: var(--fg-tertiary);
             margin-bottom: var(--space-sm);
         }
@@ -168,14 +285,21 @@
             position: relative;
             display: flex;
             align-items: center;
-            background: rgba(0,0,0,0.25);
+            background: rgba(0,0,0,0.3);
             border: 1px solid var(--border-default);
             border-radius: var(--radius-md);
-            transition: border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+            transition: border-color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), background 0.25s var(--ease-out);
+        }
+        .input-wrapper:hover {
+            border-color: rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.35);
         }
         .input-wrapper:focus-within {
             border-color: var(--brand);
-            box-shadow: 0 0 0 3px var(--brand-subtle);
+            box-shadow:
+                0 0 0 3px var(--brand-subtle),
+                inset 0 0 0 1px rgba(254,81,38,0.05);
+            background: rgba(0,0,0,0.25);
         }
         .input-wrapper .input-icon {
             position: absolute;
@@ -185,7 +309,7 @@
             color: var(--fg-tertiary);
             flex-shrink: 0;
             pointer-events: none;
-            transition: color 0.2s var(--ease-out);
+            transition: color 0.25s var(--ease-out);
         }
         .input-wrapper:focus-within .input-icon {
             color: var(--brand);
@@ -195,7 +319,7 @@
             background: transparent;
             border: none;
             outline: none;
-            padding: 13px 14px 13px 42px;
+            padding: 14px 14px 14px 44px;
             color: var(--fg-primary);
             font-size: 14px;
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -203,6 +327,7 @@
         .input-wrapper input::placeholder {
             color: var(--fg-muted);
             font-size: 13px;
+            font-weight: 400;
         }
         .input-wrapper input:-webkit-autofill,
         .input-wrapper input:-webkit-autofill:hover,
@@ -231,9 +356,16 @@
             color: var(--brand);
             background: var(--brand-subtle);
         }
+        .toggle-pwd:active {
+            transform: scale(0.92);
+        }
         .toggle-pwd svg {
             width: 18px;
             height: 18px;
+            transition: transform 0.15s var(--ease-out);
+        }
+        .toggle-pwd:hover svg {
+            transform: scale(1.1);
         }
 
         /* --- Checkbox (custom) --- */
@@ -258,6 +390,9 @@
             transition: all 0.2s var(--ease-out);
             flex-shrink: 0;
         }
+        .checkbox-row:hover .check-box {
+            border-color: var(--fg-tertiary);
+        }
         .checkbox-row input[type="checkbox"]:checked + .check-box {
             background: var(--brand);
             border-color: var(--brand);
@@ -266,11 +401,13 @@
             width: 12px;
             height: 12px;
             opacity: 0;
-            transition: opacity 0.2s var(--ease-out);
+            transition: opacity 0.15s var(--ease-out), transform 0.15s var(--ease-out);
             color: white;
+            transform: scale(0.8);
         }
         .checkbox-row input[type="checkbox"]:checked + .check-box svg {
             opacity: 1;
+            transform: scale(1);
         }
         .checkbox-row label {
             font-size: 13px;
@@ -278,11 +415,14 @@
             cursor: pointer;
             user-select: none;
         }
+        .checkbox-row label:hover {
+            color: var(--fg-primary);
+        }
 
         /* --- Button --- */
         .btn-submit {
             width: 100%;
-            background: var(--brand);
+            background: linear-gradient(135deg, var(--brand), #e84720);
             color: white;
             padding: 14px 24px;
             border: none;
@@ -291,7 +431,7 @@
             font-weight: 700;
             font-family: 'Plus Jakarta Sans', sans-serif;
             cursor: pointer;
-            transition: all 0.2s var(--ease-out);
+            transition: all 0.25s var(--ease-out);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -299,13 +439,23 @@
             position: relative;
             overflow: hidden;
         }
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--brand-hover), #d43d18);
+            opacity: 0;
+            transition: opacity 0.25s var(--ease-out);
+        }
+        .btn-submit:hover::before {
+            opacity: 1;
+        }
         .btn-submit:hover {
-            background: var(--brand-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 8px 24px var(--brand-glow);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px var(--brand-glow);
         }
         .btn-submit:active {
-            transform: translateY(0);
+            transform: translateY(0) scale(0.99);
         }
         .btn-submit:disabled {
             opacity: 0.5;
@@ -322,6 +472,11 @@
         }
         .btn-submit.loading .btn-text { display: none; }
         .btn-submit.loading .spinner { display: block; }
+        .btn-submit .btn-text,
+        .btn-submit .spinner {
+            position: relative;
+            z-index: 1;
+        }
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -337,6 +492,9 @@
             color: var(--fg-tertiary);
             text-decoration: none;
             transition: color 0.2s var(--ease-out);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         .forgot-row a:hover {
             color: var(--brand);
@@ -344,6 +502,7 @@
         .forgot-row a span {
             color: var(--fg-secondary);
             font-weight: 600;
+            transition: color 0.2s var(--ease-out);
         }
         .forgot-row a:hover span {
             color: var(--brand);
@@ -358,6 +517,7 @@
             font-weight: 500;
             display: none;
             text-align: center;
+            transition: all 0.3s var(--ease-out);
         }
         #message.show { display: block; }
         #message.success {
@@ -401,7 +561,7 @@
             letter-spacing: 0.04em;
         }
 
-        /* --- Error shake animation --- */
+        /* --- Error shake --- */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             20% { transform: translateX(-6px); }
@@ -411,15 +571,122 @@
         }
         .shake { animation: shake 0.4s var(--ease-out); }
 
-        /* --- Responsive --- */
-        @media (max-width: 480px) {
-            .login-container { padding: var(--space-lg); }
-            .login-card { padding: var(--space-2xl) var(--space-xl); border-radius: var(--radius-xl); }
+        /* === RESPONSIVE BREAKPOINTS === */
+
+        /* --- Phones (< 480px) --- */
+        @media (max-width: 479px) {
+            .login-container {
+                padding: var(--space-lg);
+                max-width: 100%;
+            }
+            .login-card {
+                padding: var(--space-2xl) var(--space-xl);
+                border-radius: var(--radius-xl);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+            }
             .greeting h2 { font-size: 22px; }
+            .greeting p { font-size: 13px; }
+            .logo-section img { width: 36px; height: 36px; }
+            .logo-text h1 { font-size: 18px; }
+            .logo-divider { height: 28px; }
+            .input-wrapper input { padding: 12px 12px 12px 40px; font-size: 13px; }
+            .btn-submit { padding: 12px 20px; font-size: 13px; }
+            .card-badge { top: var(--space-md); right: var(--space-md); }
+            .bg-orb--1 { width: 300px; height: 300px; }
+            .bg-orb--2 { width: 200px; height: 200px; }
+            .bg-orb--3 { display: none; }
+            .bg-grid { background-size: 40px 40px; }
+            .login-footer { gap: var(--space-md); }
+            .login-footer span,
+            .login-footer a { font-size: 9px; }
+        }
+
+        /* --- Small phones (< 360px) --- */
+        @media (max-width: 359px) {
+            .login-container { padding: var(--space-md); }
+            .login-card { padding: var(--space-xl) var(--space-lg); border-radius: var(--radius-lg); }
+            .greeting h2 { font-size: 18px; }
+            .logo-section { gap: var(--space-md); margin-bottom: var(--space-xl); }
+            .checkbox-row label { font-size: 12px; }
+        }
+
+        /* --- Tablets (480px - 820px) --- */
+        @media (min-width: 480px) and (max-width: 820px) {
+            .login-container {
+                max-width: 420px;
+                padding: var(--space-xl);
+            }
+            .login-card {
+                padding: var(--space-3xl) var(--space-2xl);
+            }
+            .bg-orb--1 { width: 400px; height: 400px; }
+            .bg-orb--2 { width: 300px; height: 300px; }
+        }
+
+        /* --- Large tablets / small laptops (820px - 1024px) --- */
+        @media (min-width: 820px) and (max-width: 1024px) {
+            .login-container { max-width: 430px; }
+        }
+
+        /* --- Laptops / Desktops (1024px - 1400px) default styles apply --- */
+
+        /* --- TV / Ultrawide (> 1400px) --- */
+        @media (min-width: 1400px) {
+            .login-container { max-width: 480px; padding: var(--space-2xl); }
+            .login-card { padding: var(--space-3xl) var(--space-3xl); }
+            .greeting h2 { font-size: 30px; }
+            .greeting p { font-size: 15px; }
+            .logo-section img { width: 52px; height: 52px; }
+            .logo-text h1 { font-size: 26px; }
+            .input-wrapper input { padding: 16px 16px 16px 48px; font-size: 15px; }
+            .btn-submit { padding: 16px 28px; font-size: 15px; }
+            .bg-orb--1 { width: 700px; height: 700px; }
+            .bg-orb--2 { width: 500px; height: 500px; }
+            .bg-orb--3 { width: 350px; height: 350px; }
+            .bg-grid { background-size: 80px 80px; }
+        }
+
+        /* --- 4K / Large TV (> 2000px) --- */
+        @media (min-width: 2000px) {
+            .login-container { max-width: 520px; }
+            .login-card {
+                padding: var(--space-3xl) 56px;
+                border-radius: 28px;
+            }
+            .logo-section img { width: 60px; height: 60px; }
+            .logo-text h1 { font-size: 30px; }
+            .greeting h2 { font-size: 34px; }
+            .input-wrapper input { padding: 18px 18px 18px 52px; font-size: 16px; }
+            .btn-submit { padding: 18px 32px; font-size: 16px; border-radius: var(--radius-lg); }
+            .bg-orb--1 { width: 900px; height: 900px; }
+            .bg-orb--2 { width: 600px; height: 600px; }
+        }
+
+        /* --- Landscape phones --- */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body { align-items: flex-start; padding: var(--space-lg) 0; }
+            .login-container { padding: var(--space-md); max-width: 360px; }
+            .login-card { padding: var(--space-xl) var(--space-lg); border-radius: var(--radius-lg); }
+            .logo-section { margin-bottom: var(--space-lg); }
+            .logo-section img { width: 28px; height: 28px; }
+            .logo-divider { height: 24px; }
+            .greeting h2 { font-size: 18px; margin-bottom: 2px; }
+            .greeting p { font-size: 12px; margin-bottom: var(--space-lg); display: none; }
+            .input-group { margin-bottom: var(--space-md); }
+            .forgot-row { margin-bottom: var(--space-md); }
+            .checkbox-row { margin-bottom: var(--space-md); }
+            .bg-orb--1, .bg-orb--2, .bg-orb--3 { opacity: 0.2; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Decorative Background Elements -->
+    <div class="bg-grid"></div>
+    <div class="bg-orb bg-orb--1"></div>
+    <div class="bg-orb bg-orb--2"></div>
+    <div class="bg-orb bg-orb--3"></div>
 
     <!-- Three.js Background -->
     <div id="three-bg" style="position: fixed; inset: 0; z-index: 0;"></div>
@@ -427,6 +694,7 @@
     <!-- Login Container -->
     <div class="login-container">
         <div class="login-card">
+            <span class="card-badge">Acceso Privado</span>
 
             <!-- Logo -->
             <div class="logo-section">
@@ -441,7 +709,7 @@
             <!-- Greeting -->
             <div class="greeting">
                 <h2>Bienvenido</h2>
-                <p>Ingresa tus credenciales para acceder al panel de control</p>
+                <p>Ingresa tus credenciales para acceder al panel de control de equipos y servicios industriales.</p>
             </div>
 
             <!-- Form -->
@@ -511,7 +779,7 @@
         </div>
     </div>
 
-    <!-- Three.js Script -->
+    <!-- Three.js Background Script -->
     <script type="module">
         import * as THREE from 'three';
 
@@ -522,7 +790,7 @@
         scene.background = new THREE.Color(0x1a1c26);
 
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 20;
+        camera.position.z = 22;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -531,69 +799,140 @@
         renderer.toneMappingExposure = 1.2;
         bgContainer.appendChild(renderer.domElement);
 
-        // Particles
-        const particleCount = 400;
+        // --- PARTICLE STARS (600 points, gradient colors, varied sizes) ---
+        const particleCount = 600;
         const positions = new Float32Array(particleCount * 3);
         const colors = new Float32Array(particleCount * 3);
+        const sizes = new Float32Array(particleCount);
         const primaryColor = new THREE.Color(0xfe5126);
         const accentColor = new THREE.Color(0x4a6cf7);
+        const subtleColor = new THREE.Color(0x6c5ce7);
 
         for (let i = 0; i < particleCount; i++) {
-            positions[i*3] = (Math.random() - 0.5) * 50;
-            positions[i*3+1] = (Math.random() - 0.5) * 40;
-            positions[i*3+2] = (Math.random() - 0.5) * 30;
-            const c = primaryColor.clone().lerp(accentColor, Math.random());
+            const radius = 15 + Math.random() * 35;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            positions[i*3] = radius * Math.sin(phi) * Math.cos(theta);
+            positions[i*3+1] = radius * Math.cos(phi);
+            positions[i*3+2] = radius * Math.sin(phi) * Math.sin(theta) - 5;
+
+            const mix = Math.random();
+            let c;
+            if (mix < 0.4) c = primaryColor.clone().lerp(accentColor, Math.random());
+            else if (mix < 0.7) c = accentColor.clone().lerp(subtleColor, Math.random());
+            else c = new THREE.Color(0x94a3b8).lerp(new THREE.Color(0xfe5126), Math.random() * 0.3);
             colors[i*3] = c.r; colors[i*3+1] = c.g; colors[i*3+2] = c.b;
+            sizes[i] = 0.05 + Math.random() * 0.2;
         }
 
         const particleGeo = new THREE.BufferGeometry();
         particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particleGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
-        const particles = new THREE.Points(
-            particleGeo,
-            new THREE.PointsMaterial({
-                size: 0.12, vertexColors: true, transparent: true,
-                opacity: 0.6, blending: THREE.AdditiveBlending, sizeAttenuation: true
-            })
-        );
+        const particleMat = new THREE.PointsMaterial({
+            size: 0.15, vertexColors: true, transparent: true,
+            opacity: 0.6, blending: THREE.AdditiveBlending, sizeAttenuation: true,
+            depthWrite: false
+        });
+        const particles = new THREE.Points(particleGeo, particleMat);
         scene.add(particles);
 
-        // Floaty geometric shapes
+        // --- LARGER GLOWING ORBS (soft billboard sprites) ---
+        function createGlowSprite(color, size, opacity) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128; canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+            gradient.addColorStop(0, `rgba(${color.r*255|0},${color.g*255|0},${color.b*255|0},${opacity})`);
+            gradient.addColorStop(0.3, `rgba(${color.r*255|0},${color.g*255|0},${color.b*255|0},${opacity * 0.4})`);
+            gradient.addColorStop(1, `rgba(${color.r*255|0},${color.g*255|0},${color.b*255|0},0)`);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 128, 128);
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({
+                map: texture, blending: THREE.AdditiveBlending,
+                transparent: true, depthWrite: false,
+                opacity: 0.5
+            });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(size, size, 1);
+            return sprite;
+        }
+
+        const orbPositions = [
+            { x: -8, y: 6, z: -12, color: new THREE.Color(0xfe5126), size: 5 },
+            { x: 9, y: -5, z: -15, color: new THREE.Color(0x4a6cf7), size: 4 },
+            { x: -5, y: -7, z: -10, color: new THREE.Color(0x6c5ce7), size: 3 },
+            { x: 7, y: 8, z: -18, color: new THREE.Color(0xff8c6b), size: 3.5 },
+        ];
+        const glowOrbs = orbPositions.map(p => {
+            const sprite = createGlowSprite(p.color, p.size, 0.3);
+            sprite.position.set(p.x, p.y, p.z);
+            sprite.userData = {
+                floatSpeed: 0.3 + Math.random() * 0.2,
+                floatAmount: 0.3 + Math.random() * 0.4,
+                baseX: p.x, baseY: p.y, baseZ: p.z,
+                phase: Math.random() * Math.PI * 2
+            };
+            scene.add(sprite);
+            return sprite;
+        });
+
+        // --- GEOMETRIC SHAPES (12 floating objects with refined material) ---
         const shapes = [];
-        const shapeColors = [0xfe5126, 0x4a6cf7, 0xff8c6b, 0x6c5ce7];
+        const shapeColors = [0xfe5126, 0x4a6cf7, 0xff8c6b, 0x6c5ce7, 0xf97316];
         const geos = [
             new THREE.TorusKnotGeometry(0.5, 0.18, 48, 6),
             new THREE.OctahedronGeometry(0.6),
             new THREE.IcosahedronGeometry(0.5),
             new THREE.TorusGeometry(0.45, 0.18, 12, 24),
+            new THREE.DodecahedronGeometry(0.55),
         ];
 
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 10; i++) {
             const mesh = new THREE.Mesh(geos[i % geos.length], new THREE.MeshPhysicalMaterial({
                 color: shapeColors[i % shapeColors.length],
                 metalness: 0.3, roughness: 0.5, transparent: true,
-                opacity: 0.1 + Math.random() * 0.12,
+                opacity: 0.08 + Math.random() * 0.12,
                 wireframe: Math.random() > 0.5
             }));
-            mesh.position.set((Math.random() - 0.5) * 35, (Math.random() - 0.5) * 25, (Math.random() - 0.5) * 20 - 3);
+            mesh.position.set(
+                (Math.random() - 0.5) * 40,
+                (Math.random() - 0.5) * 30,
+                (Math.random() - 0.5) * 20 - 5
+            );
             mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+            const scale = 0.6 + Math.random() * 0.8;
+            mesh.scale.set(scale, scale, scale);
             mesh.userData = {
-                rotSpeed: (Math.random() - 0.5) * 0.008,
+                rotSpeed: (Math.random() - 0.5) * 0.01,
                 floatSpeed: 0.15 + Math.random() * 0.25,
-                floatAmt: 0.2 + Math.random() * 0.4,
-                baseY: mesh.position.y
+                floatAmount: 0.2 + Math.random() * 0.4,
+                baseY: mesh.position.y,
+                baseX: mesh.position.x,
+                orbitSpeed: (Math.random() - 0.5) * 0.003,
+                orbitRadius: 1 + Math.random() * 2,
+                phase: Math.random() * Math.PI * 2
             };
             scene.add(mesh);
             shapes.push(mesh);
         }
 
-        // Mouse parallax
+        // --- MOUSE PARALLAX ---
         const mouse = { x: 0, y: 0 }, target = { x: 0, y: 0 };
         document.addEventListener('mousemove', (e) => {
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
         });
+
+        // --- TOUCH PARALLAX (mobile) ---
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+            }
+        }, { passive: true });
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -601,6 +940,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
+        // --- ANIMATION LOOP ---
         function animate() {
             requestAnimationFrame(animate);
             const t = performance.now() / 1000;
@@ -608,17 +948,30 @@
             target.x += (mouse.x - target.x) * 0.02;
             target.y += (mouse.y - target.y) * 0.02;
 
-            camera.position.x += (target.x * 1.2 - camera.position.x) * 0.01;
-            camera.position.y += (target.y * 0.8 - camera.position.y) * 0.01;
+            camera.position.x += (target.x * 1.5 - camera.position.x) * 0.008;
+            camera.position.y += (target.y * 1.0 - camera.position.y) * 0.008;
             camera.lookAt(0, 0, 0);
 
-            particles.rotation.y = t * 0.025;
-            particles.rotation.x = Math.sin(t * 0.008) * 0.04;
+            // Rotate particle field slowly
+            particles.rotation.y = t * 0.03;
+            particles.rotation.x = Math.sin(t * 0.008) * 0.05;
+            particleMat.size = 0.12 + Math.sin(t * 0.5) * 0.03;
 
+            // Animate glow orbs
+            glowOrbs.forEach((orb, i) => {
+                const d = orb.userData;
+                orb.position.y = d.baseY + Math.sin(t * d.floatSpeed + d.phase) * d.floatAmount;
+                orb.position.x = d.baseX + Math.cos(t * d.floatSpeed * 0.7 + d.phase) * d.floatAmount * 0.5;
+                orb.material.opacity = 0.25 + Math.sin(t * 0.4 + d.phase) * 0.1;
+            });
+
+            // Animate geometric shapes
             shapes.forEach((mesh, i) => {
-                mesh.rotation.x += mesh.userData.rotSpeed * 1.5;
-                mesh.rotation.y += mesh.userData.rotSpeed;
-                mesh.position.y = mesh.userData.baseY + Math.sin(t * mesh.userData.floatSpeed + i * 1.5) * mesh.userData.floatAmt;
+                const d = mesh.userData;
+                mesh.rotation.x += d.rotSpeed * 1.5;
+                mesh.rotation.y += d.rotSpeed;
+                mesh.position.y = d.baseY + Math.sin(t * d.floatSpeed + d.phase + i) * d.floatAmount;
+                mesh.position.x = d.baseX + Math.cos(t * d.orbitSpeed + d.phase) * d.orbitRadius;
             });
 
             renderer.render(scene, camera);
