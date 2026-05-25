@@ -1552,8 +1552,7 @@
         }
 
         function openQuoteModal() {
-            document.getElementById('quoteModal').classList.remove('hidden');
-            document.getElementById('quoteModal').classList.add('flex');
+            document.getElementById('quoteModal').classList.add('show');
             setTimeout(() => document.getElementById('quoteModalContent').classList.remove('scale-95', 'opacity-0'), 10);
             document.getElementById('quoteItemsTableBody').innerHTML = '';
             addQuoteItem();
@@ -1562,8 +1561,7 @@
         function closeQuoteModal() {
             document.getElementById('quoteModalContent').classList.add('scale-95', 'opacity-0');
             setTimeout(() => {
-                document.getElementById('quoteModal').classList.add('hidden');
-                document.getElementById('quoteModal').classList.remove('flex');
+                document.getElementById('quoteModal').classList.remove('show');
                 document.getElementById('quoteForm').reset();
             }, 200);
         }
@@ -1780,10 +1778,22 @@
             for (let task of tasks) { if (task.date === dStr && task.time === tStr && !task.alerted) { showCustomAlert(task); task.alerted = true; await fetch(`${API_URL}/tasks`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(task) }); } }
         }
         function showCustomAlert(task) { document.getElementById('alertTitle').textContent = task.title; document.getElementById('alertDesc').textContent = task.description || 'Pendiente ahora.'; document.getElementById('customAlert').classList.add('show'); alertSound.currentTime = 0; alertSound.play().catch(e => {}); }
-        function dismissAlert() { document.getElementById('customAlert').classList.remove('show'); }
-        function openModal() { editingTaskId = null; document.querySelector('#taskModal h3').textContent = 'Añadir Evento'; document.getElementById('taskModal').classList.remove('hidden'); document.getElementById('taskModal').classList.add('flex'); setTimeout(() => document.getElementById('modalContent').classList.remove('scale-95', 'opacity-0'), 10); document.getElementById('taskDate').valueAsDate = selectedDate; }
-        function editTask(id) { const task = tasks.find(t => t.id === id); if(!task) return; editingTaskId = id; document.querySelector('#taskModal h3').textContent = 'Editar Evento'; document.getElementById('taskTitle').value = task.title; document.getElementById('taskDesc').value = task.description; document.getElementById('taskDate').value = task.date; document.getElementById('taskTime').value = task.time; document.getElementById('taskModal').classList.remove('hidden', 'flex'); document.getElementById('taskModal').classList.add('flex'); setTimeout(() => document.getElementById('modalContent').classList.remove('scale-95', 'opacity-0'), 10); }
-        function closeModal() { document.getElementById('modalContent').classList.add('scale-95', 'opacity-0'); setTimeout(() => { document.getElementById('taskModal').classList.add('hidden', 'flex'); document.getElementById('taskModal').classList.remove('flex'); document.getElementById('taskForm').reset(); }, 200); }
+        function dismissAlert() { document.getElementById('customAlert').classList.remove('show'); }        function openModal() {
+            editingTaskId = null;
+            document.querySelector('#taskModal h3').textContent = 'Añadir Evento';
+            document.getElementById('taskModal').classList.add('show');
+            setTimeout(() => document.getElementById('modalContent').classList.remove('scale-95', 'opacity-0'), 10);
+            document.getElementById('taskDate').valueAsDate = selectedDate;
+        }        function editTask(id) {
+            const task = tasks.find(t => t.id === id); if(!task) return;
+            editingTaskId = id;
+            document.querySelector('#taskModal h3').textContent = 'Editar Evento';
+            document.getElementById('taskTitle').value = task.title; document.getElementById('taskDesc').value = task.description;
+            document.getElementById('taskDate').value = task.date; document.getElementById('taskTime').value = task.time;
+            document.getElementById('taskModal').classList.add('show');
+            setTimeout(() => document.getElementById('modalContent').classList.remove('scale-95', 'opacity-0'), 10);
+        }
+        function closeModal() { document.getElementById('modalContent').classList.add('scale-95', 'opacity-0'); setTimeout(() => { document.getElementById('taskModal').classList.remove('show'); document.getElementById('taskForm').reset(); }, 200); }
         document.getElementById('taskForm').onsubmit = async (e) => {
             e.preventDefault(); const data = { id: editingTaskId || Date.now().toString(), title: document.getElementById('taskTitle').value, description: document.getElementById('taskDesc').value, date: document.getElementById('taskDate').value, time: document.getElementById('taskTime').value, alerted: false };
             try { await fetch(`${API_URL}/tasks`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); await loadTasks(); renderCalendar(); renderTaskList(); if(currentView === 'dashboard') renderDashboard(); closeModal(); } catch (err) { alert('Error'); }
