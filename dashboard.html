@@ -184,9 +184,9 @@
 
         /* --- Sidebar Collapse Toggle --- */
         .sidebar-collapse-btn {
-            position: absolute;
+            position: fixed;
             top: 20px;
-            right: -13px;
+            left: 247px;
             width: 26px;
             height: 26px;
             border-radius: 50%;
@@ -197,7 +197,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 25;
+            z-index: 30;
             transition: all 0.25s var(--ease-out);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
@@ -220,7 +220,7 @@
             transform: rotate(180deg);
         }
         body.sidebar-collapsed .sidebar-collapse-btn {
-            right: -13px;
+            left: 4px;
             border-color: var(--border-medium);
             background: var(--surface-raised);
         }
@@ -752,6 +752,7 @@
 
         /* --- Phones (< 640px) --- */
         @media (max-width: 639px) {
+            .sidebar-collapse-btn { display: none !important; }
             .sidebar {
                 position: fixed;
                 top: 0;
@@ -834,6 +835,7 @@
         /* --- Tablets (640px - 1024px) --- */
         @media (min-width: 640px) and (max-width: 1024px) {
             .sidebar { width: 220px; }
+            .sidebar-collapse-btn { left: 207px; }
             .sidebar .nav-btn { padding: 8px var(--space-md); font-size: 13px; }
 
             .topbar { padding: 0 var(--space-xl); }
@@ -863,6 +865,7 @@
         /* --- TV / Ultrawide (> 1400px) --- */
         @media (min-width: 1400px) {
             .sidebar { width: 280px; }
+            .sidebar-collapse-btn { left: 267px; }
             .sidebar .nav-btn { padding: 12px var(--space-xl); font-size: 15px; }
             .topbar { padding: 0 var(--space-3xl); }
             #view-events { padding: var(--space-3xl); gap: var(--space-3xl); }
@@ -916,11 +919,12 @@
     <!-- Sidebar Overlay (mobile) -->
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
+    <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="Colapsar sidebar" id="sidebarCollapseBtn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+    </button>
+
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar flex flex-col shrink-0">
-        <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="Colapsar sidebar" id="sidebarCollapseBtn">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-        </button>
         <div class="sidebar-inner p-6">
             <div class="flex items-center gap-3 mb-10 px-2">
                 <img src="1sdas.png" alt="Logo" class="w-8 h-8 object-contain">
