@@ -1772,19 +1772,56 @@ async function exportToExcel(quoteId) {
                 const firstPage = pdfDoc.getPages()[0];
                 const { height } = firstPage.getSize();
                 const drawText = (text, x, y, size = 10) => { if (!text) return; firstPage.drawText(text.toString(), { x, y: height - y, size }); };
-                drawText(quote.company, 110, 165); drawText(quote.ruc, 110, 180); drawText(quote.client_name, 110, 195); drawText(quote.address, 110, 210);
-                drawText(new Date(quote.quote_date).toLocaleDateString(), 450, 165); drawText(quote.offer_validity, 450, 180);
-                drawText(quote.activities, 110, 240, 9); drawText(quote.location, 110, 255, 9); drawText(quote.equipment, 450, 255, 9);
+                
+                // --- COMPANY INFO SECTION ---
+                // Row 1: EMPRESA (label at Y=86) + FECHA (label at Y=86)
+                drawText(quote.company, 110, 86, 10);
+                drawText(new Date(quote.quote_date).toLocaleDateString(), 470, 86, 10);
+                
+                // Row 2: RUC (label at Y=98) + VALIDEZ DE OFERTA (label at Y=98)
+                drawText(quote.ruc, 70, 98, 10);
+                drawText(quote.offer_validity, 475, 98, 10);
+                
+                // Row 3: SEÑOR(a) (label at Y=109) + VALIDO HASTA (label at Y=109)
+                drawText(quote.client_name, 110, 109, 10);
+                drawText(quote.valid_until ? new Date(quote.valid_until).toLocaleDateString() : '', 475, 109, 10);
+                
+                // Row 4: DIRECCION (label at Y=120)
+                drawText(quote.address, 110, 120, 10);
+                
+                // --- ACTIVITIES (label at Y=174) ---
+                drawText(quote.activities, 40, 190, 9);
+                
+                // --- LOCATION / EQUIPMENT ---
+                // UBICACIÓN (label at Y=364)
+                drawText(quote.location, 105, 364, 9);
+                // EQUIPO (label at Y=386)
+                drawText(quote.equipment, 105, 386, 9);
+                
+                // --- ITEMS TABLE ---
+                // Table header is at drawText Y=408 (already in template)
+                // First data row starts at drawText Y=419
                 const items = typeof quote.items === 'string' ? JSON.parse(quote.items) : quote.items;
-                let itemY = 320;
+                let itemY = 419;
+                const rowHeight = 11;
+                
                 items.forEach((item, index) => {
-                    drawText((index + 1).toString(), 50, itemY); drawText(item.description, 90, itemY, 8); drawText(item.und, 350, itemY);
-                    drawText(item.qty, 400, itemY); drawText(parseFloat(item.price).toFixed(2), 460, itemY); drawText(parseFloat(item.partial).toFixed(2), 530, itemY);
-                    itemY += 15;
+                    // Column positions based on template:
+                    // ITEM: X=68 | DESCRIPCIÓN: X=110 | UND: X=338 | CANTIDAD: X=375 | P.UNITARIO: X=420 | PARCIAL: X=510
+                    drawText((index + 1).toString(), 68, itemY, 8);
+                    drawText(item.description, 110, itemY, 8);
+                    drawText(item.und, 338, itemY, 8);
+                    drawText(item.qty, 378, itemY, 8);
+                    drawText(parseFloat(item.price).toFixed(2), 425, itemY, 8);
+                    drawText(parseFloat(item.partial).toFixed(2), 510, itemY, 8);
+                    itemY += rowHeight;
                 });
-                drawText('S/ ' + quote.total_amount, 530, 750, 12);
+                
+                // --- TOTAL ---
+                // TOTAL label is at drawText Y=527
+                drawText('S/ ' + quote.total_amount, 510, 527, 11);
+                
                 const pdfBytes = await pdfDoc.save();
-                const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([pdfBytes], { type: 'application/pdf' }));
                 downloadBlob(new Blob([pdfBytes], { type: 'application/pdf' }), `Presupuesto_${quote.company.replace(/\s+/g, '_')}.pdf`);
             } catch (err) { alert('Error al generar PDF'); }
         }
